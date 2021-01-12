@@ -1,0 +1,75 @@
+8081/pettycash/view/getTransaction?userId=1 (landing page / view page) (get)
+return = 
+{
+	"name" : string,
+	"startBalance" : long,
+	"code" : String,
+	"department" : String,
+	"transaction" : [
+			  {
+				"receipt" : String (income/outcome),
+				"description" : String,
+				"amount" : long,
+				"transactionDate" : date;
+				"transactionType" : {
+							"transactionTypeId" : String,
+							"transactionTypeName" : String,
+							"createdDate" : Date,
+							"updatedDate" : Date
+						    },
+				"residue" : long (startBalance - amount)
+			  }	
+			]
+}
+
+
+8081/pettycash/view/getTransactionType (get)
+return =
+{
+	"transactionType" : [
+				{
+				"transactionTypeId" : String,
+				"transactionTypeName" : String,
+				"createdDate" : Date,
+				"updatedDate" : Date
+				}
+			    ]
+}
+
+8081/pettycash/add/incomeTransaction (post)
+requestBody =
+{
+	"description" : String,
+	"receipt" : String (INCOME),
+	"amount" : long,
+	"transactionTypeId" : String (get dari api di atas / dropdown),
+	"userId" : String (1)
+}
+
+
+8081/pettycash/add/outcomeTransaction (post)
+requestBody =
+{
+	"description" : String,
+	"receipt" : String (OUTCOME)
+	"amount" : long,
+	"transactionTypeId" : String (get dari api di atas / dropdown),
+	"userId" : String (1)
+}
+
+
+
+
+tambahan transaction id: 
+1. gakepake
+2. Transportation
+3. Medical
+4. Consmption
+5. Office Supplies
+6. Courier Fee
+7. Stamp Duty
+8. Phone
+9. Internet
+10. Entertainment
+11. Reimburse
+12. Topup

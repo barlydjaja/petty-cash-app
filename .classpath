@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="back_end/src/main/java"/>
+	<classpathentry kind="lib" path="back_end/target/petty-cash-0.01.jar"/>
+	<classpathentry kind="output" path="back_end/target/classes"/>
+</classpath>

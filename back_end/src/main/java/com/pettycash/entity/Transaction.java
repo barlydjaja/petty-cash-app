@@ -48,7 +48,7 @@ public class Transaction implements Serializable{
 	@Column(name = "transaction_date")
 	private Date transactionDate;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "transaction_type_id")
 	private TransactionType transactionType;
 	

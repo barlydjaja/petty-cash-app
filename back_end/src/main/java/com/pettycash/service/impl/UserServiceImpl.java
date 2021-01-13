@@ -40,4 +40,9 @@ public class UserServiceImpl implements UserService{
 		updateUser.setAccountBalance(updateUser.getAccountBalance() + amount);
 		repo.save(updateUser);
 	}
+
+	public void updateUser(User user, long amount) {
+		user.setAccountBalance(amount);
+		repo.save(user);
+	}
 }

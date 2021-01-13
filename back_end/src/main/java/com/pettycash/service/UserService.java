@@ -9,4 +9,5 @@ public interface UserService {
 	User addUser(UserDTO details);
 	User getUserById(long userId) throws NotFoundException;
 	public void updateUserBalance(long userId, long amount);
+	void updateUser(User user, long amount);
 }

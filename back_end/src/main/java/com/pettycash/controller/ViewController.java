@@ -61,8 +61,7 @@ public class ViewController {
 
 	@GetMapping("/getTransaction")
 	@CrossOrigin
-	public ResponseEntity<Map<String, Object>> getTransactionByUserIdWithPaging(@RequestParam("userId") long userId, @RequestParam int page){
-		try {
+	public ResponseEntity<Map<String, Object>> getTransactionByUserIdWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException{
 		      List<Transaction> transactions = new ArrayList<Transaction>();
 		      User user = userService.getUserById(userId);
 		      Pageable paging = PageRequest.of(page, 10);
@@ -81,9 +80,6 @@ public class ViewController {
 		      response.put("totalPages", pageTrans.getTotalPages());
 
 		      return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-		    } catch (Exception e) {
-		      return new ResponseEntity<Map<String, Object>>(HttpStatus.INTERNAL_SERVER_ERROR);
-		    }
 	}
 	
 }

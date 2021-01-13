@@ -1,14 +1,21 @@
 package com.pettycash.controller;
 
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pettycash.dto.GeneralResponse;
 import com.pettycash.dto.TransactionDTO;
 import com.pettycash.dto.TransactionTypeDTO;
 import com.pettycash.dto.UserDTO;
@@ -34,24 +41,13 @@ public class TransactionController {
 	@Autowired
 	UserService userService;
 	
-	@PostMapping("/incomeTransaction")
+	@PostMapping("/addTransaction")
 	@CrossOrigin
-	public ResponseEntity<Transaction> addIncomeTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException{
+	public ResponseEntity<Transaction> addTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException{
 
 		User user = userService.getUserById(transactionDTO.getUserId());
 		TransactionType transactionType = transactionTypeService.getTypeById(transactionDTO.getTransactionTypeId());
-		Transaction transaction = transactionService.addTransaction(transactionDTO, true, user, transactionType);
-		
-		return new ResponseEntity<Transaction>(transaction, HttpStatus.OK);
-	}
-	
-	@PostMapping("/outcomeTransaction")
-	@CrossOrigin
-	public ResponseEntity<Transaction> addOutcomeTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException{
-
-		User user = userService.getUserById(transactionDTO.getUserId());
-		TransactionType transactionType = transactionTypeService.getTypeById(transactionDTO.getTransactionTypeId());
-		Transaction transaction = transactionService.addTransaction(transactionDTO, false, user, transactionType);
+		Transaction transaction = transactionService.addTransaction(transactionDTO, user, transactionType);
 		
 		return new ResponseEntity<Transaction>(transaction, HttpStatus.OK);
 	}
@@ -70,5 +66,52 @@ public class TransactionController {
 		TransactionType type = transactionTypeService.addType(name.getName());
 		
 		return new ResponseEntity<TransactionType>(type, HttpStatus.OK);
+	}
+	
+	@GetMapping("/delete-transaction")
+	@CrossOrigin
+	public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long transactionId, HttpServletRequest request){
+		HttpStatus status;
+		GeneralResponse response = new GeneralResponse();
+		boolean result = transactionService.deleteTransaction(transactionId);
+		
+		if(result) {
+			response.setPath(request.getRequestURI());
+			response.setResponse("200");
+			response.setMessage("SUCCESS");
+			response.setDate(new Date());
+			status = HttpStatus.OK;
+		} else {
+			response.setPath(request.getRequestURI());
+			response.setResponse("500");
+			response.setMessage("INTERNAL SERVER ERROR");
+			response.setDate(new Date());
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		
+		return new ResponseEntity<GeneralResponse>(response, status);
+	}
+	
+	@PostMapping("/update-transaction")
+	public ResponseEntity<GeneralResponse> updateTransaction(@RequestParam long transactionId, @RequestBody TransactionDTO transactionDTO, HttpServletRequest request) throws NotFoundException{
+		HttpStatus status;
+		GeneralResponse response = new GeneralResponse();
+		boolean result = transactionService.updateTransaction(transactionId, transactionDTO, transactionDTO.getUserId());
+
+		if(result) {
+			response.setPath(request.getRequestURI());
+			response.setResponse("200");
+			response.setMessage("SUCCESS");
+			response.setDate(new Date());
+			status = HttpStatus.OK;
+		} else {
+			response.setPath(request.getRequestURI());
+			response.setResponse("500");
+			response.setMessage("INTERNAL SERVER ERROR");
+			response.setDate(new Date());
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		
+		return new ResponseEntity<GeneralResponse>(response, status);
 	}
 }

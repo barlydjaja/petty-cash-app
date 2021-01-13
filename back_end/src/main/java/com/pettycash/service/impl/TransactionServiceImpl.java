@@ -189,10 +189,12 @@ public class TransactionServiceImpl implements TransactionService{
 			transaction.setTransactionType(dtoType);
 		}
 
-		if(dto.getAmount() != transaction.getAmount()) {
+		if(dto.getAmount() != transaction.getAmount() || !dto.getReceipt().equalsIgnoreCase(transaction.getReceipt())) {
 			if(dto.getReceipt().equalsIgnoreCase("outcome")) {
 				transaction.setAmount(0 - dto.getAmount());
 			} else	transaction.setAmount(dto.getAmount());
+			
+			transaction.setReceipt(dto.getReceipt());
 			
 			User user = userService.getUserById(userId);
 			

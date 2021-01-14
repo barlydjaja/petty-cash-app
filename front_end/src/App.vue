@@ -3,7 +3,9 @@
     <router-link to="/" />
     <router-link to="/about" />
     <router-link to="/demo" />
+    <router-link to="/login" />
     <router-view />
+    <h1></h1>
   </div>
 </template>
 
@@ -22,6 +24,6 @@ export default {
 
 .background {
   background: #458679;
-  min-height: 100vh;
+  min-height: 90vh;
 }
 </style>

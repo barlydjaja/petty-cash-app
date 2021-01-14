@@ -1,8 +1,8 @@
 <template>
   <b-container fluid class="p-0 footer-bar">
     <b-container class="px-0">
-      <b-row align-h="center" class="text-center pb-3 ">
-        <b-col sm="7" md="4">
+      <b-row align-h="center" class="text-center pb-3">
+        <b-col sm="7" md="4" class="px-0 ">
           <span class="text-title-config ">Tentang Kami</span>
           <hr />
           <span class="text-subtitle-config ">Profil Perusahaan</span>

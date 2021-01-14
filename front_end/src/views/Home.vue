@@ -135,10 +135,17 @@ export default {
 
 .button-text-center {
   font-size: 1.5em;
+  font-weight: bold;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@media only screen and (max-width: 400px) {
+  .button-text-center {
+    font-size: 0.8em;
+  }
 }
 
 a {

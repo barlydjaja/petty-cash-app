@@ -1,85 +1,79 @@
 <template>
-  <div class="text-center">
+  <div class="text-center align-center">
     <div>
-      <b-button v-b-modal.modal-prevent-closing class="p-3 transaction"
+      <b-button v-b-modal.modal-prevent-closing class="transaction"
         >Tambah Transaksi</b-button
       >
 
-      <div class="mt-3">
-        <!-- Submitted Names: -->
+      <!-- Submitted Names: -->
 
-        <b-modal
-          id="modal-prevent-closing"
-          ref="modal"
-          title="Masukan Transaksi"
-        >
-          <div>
-            <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-              <b-form-group
-                id="input-group-1"
-                label="Deskripsi:"
-                label-for="input-1"
-                description="Tuliskan Catatan Tentang Pengeluaran/Pemasukan Ini"
-              >
-                <b-form-input
-                  id="input-1"
-                  v-model="form.description"
-                  type="text"
-                  placeholder="Deskripsi..."
-                  required
-                ></b-form-input>
-              </b-form-group>
+      <b-modal id="modal-prevent-closing" ref="modal" title="Masukan Transaksi">
+        <div>
+          <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+            <b-form-group
+              id="input-group-1"
+              label="Deskripsi:"
+              label-for="input-1"
+              description="Tuliskan Catatan Tentang Pengeluaran/Pemasukan Ini"
+            >
+              <b-form-input
+                id="input-1"
+                v-model="form.description"
+                type="text"
+                placeholder="Deskripsi..."
+                required
+              ></b-form-input>
+            </b-form-group>
 
-              <b-form-group
-                id="input-group-2"
-                label="Jenis Transaksi"
-                label-for="input-2"
-              >
-                <b-form-select
-                  id="input-2"
-                  v-model="form.receipt"
-                  :options="incomeExpenses"
-                  required
-                ></b-form-select>
-              </b-form-group>
+            <b-form-group
+              id="input-group-2"
+              label="Jenis Transaksi"
+              label-for="input-2"
+            >
+              <b-form-select
+                id="input-2"
+                v-model="form.receipt"
+                :options="incomeExpenses"
+                required
+              ></b-form-select>
+            </b-form-group>
 
-              <b-form-group
-                id="input-group-3"
-                label="Nama Transaksi"
-                label-for="input-3"
-              >
-                <b-form-select
-                  id="input-3"
-                  v-model="form.transactionTypeId"
-                  :options="transactions"
-                  required
-                ></b-form-select>
-              </b-form-group>
+            <b-form-group
+              id="input-group-3"
+              label="Nama Transaksi"
+              label-for="input-3"
+            >
+              <b-form-select
+                id="input-3"
+                v-model="form.transactionTypeId"
+                :options="transactions"
+                required
+              ></b-form-select>
+            </b-form-group>
 
-              <b-form-group
-                id="input-group-4"
-                label="Jumlah"
-                label-for="input-4"
-                description="Jumlah uang yang masuk/keluar"
-              >
-                <b-form-input
-                  id="input-4"
-                  v-model.number="form.amount"
-                  type="number"
-                  placeholder="Rp..."
-                  required
-                ></b-form-input>
-              </b-form-group>
+            <b-form-group
+              id="input-group-4"
+              label="Jumlah"
+              label-for="input-4"
+              description="Jumlah uang yang masuk/keluar"
+            >
+              <b-form-input
+                id="input-4"
+                v-model.number="form.amount"
+                type="number"
+                placeholder="Rp..."
+                required
+              ></b-form-input>
+            </b-form-group>
 
-              <b-button type="submit" variant="primary">Submit</b-button>
-              <b-button type="reset" variant="danger">Reset</b-button>
-            </b-form>
-            <!-- <b-card class="mt-3" header="Form Data Result">
+            <b-button type="submit" variant="primary">Submit</b-button>
+            <b-button type="reset" variant="danger">Reset</b-button>
+          </b-form>
+          <!-- <b-card class="mt-3" header="Form Data Result">
               <pre class="m-0">{{ form }}</pre>
             </b-card> -->
-          </div>
-        </b-modal>
-      </div>
+        </div>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -102,18 +96,11 @@ export default {
         { text: "Office Supplies", value: 5 },
         { text: "Courier Fee", value: 6 },
         { text: "Stamp Duty", value: 7 },
-        { text: "Transportation", value: 2 },
-        { text: "Transportation", value: 2 },
-        "Medical",
-        "Consumption",
-        "Office Supplies",
-        "Courier Fee",
-        "Stamp Duty",
-        "Phone",
-        "Internet",
-        "Entertainment",
-        "Reimburse",
-        "Topup",
+        { text: "phone", value: 8 },
+        { text: "Internet", value: 9 },
+        { text: "Entertainment", value: 10 },
+        { text: "Reimburse", value: 11 },
+        { text: "Top Up", value: 12 },
       ],
       incomeExpenses: [
         { text: "Select One", value: null },
@@ -124,8 +111,8 @@ export default {
     };
   },
   methods: {
-    onSubmit() {
-      // event.preventDefault();
+    onSubmit(event) {
+      event.preventDefault();
       const url = "http://10.69.72.89:8081/pettycash/add/addTransaction";
       console.log(this.form);
       axios

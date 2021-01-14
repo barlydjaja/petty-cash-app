@@ -9,7 +9,7 @@
               Username: {{ userData.name }}
             </div>
             <br />
-            <div class="balance ">
+            <div class="balance">
               Current Balance: Rp.
               {{ accountBalance }}
             </div>
@@ -21,9 +21,7 @@
 
         <div class="new-transaction mt-2">Transaksi Baru</div>
         <b-row class="mt-3">
-          <b-col class="number" sm="2">
-            Tanggal
-          </b-col>
+          <b-col class="number" sm="2"> Tanggal </b-col>
           <b-col class="transaction" sm="2">Transaksi</b-col>
           <b-col class="date">Deskripsi</b-col>
           <b-col class="income-expenses">mutasi</b-col>
@@ -32,12 +30,14 @@
         </b-row>
 
         <Transactions v-bind:userTransactions="userTransactions" />
-        <!-- <Pagination
-          v-model="page"
-          per-page="10"
-          v-bind:records="totalItems"
-          @paginate="myCallback"
-        /> -->
+        <b-row class="justify-content-center">
+          <b-col>
+            <jw-pagination
+              :items="userTransactions"
+              @changePage="onChangePage"
+            />
+          </b-col>
+        </b-row>
       </b-jumbotron>
     </b-container>
 

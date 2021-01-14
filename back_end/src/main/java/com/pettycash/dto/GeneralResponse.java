@@ -13,5 +13,5 @@ public class GeneralResponse {
     private String message;
     private String path;
     private Date date;
-    
+
 }

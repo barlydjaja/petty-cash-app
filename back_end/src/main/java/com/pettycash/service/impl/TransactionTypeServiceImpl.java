@@ -13,30 +13,34 @@ import com.pettycash.service.TransactionTypeService;
 import javassist.NotFoundException;
 
 @Service
-public class TransactionTypeServiceImpl implements TransactionTypeService{
+public class TransactionTypeServiceImpl implements TransactionTypeService {
 
-	@Autowired
-	private TransactionTypeRepository repo;
-	
-	public TransactionType addType(String type) {
-		TransactionType newType = new TransactionType();
-		newType.setTransactionTypeName(type);
-		newType.setCreatedDate(new Date());
-		newType.setUpdatedDate(new Date());
-		
-		return repo.save(newType);
-	}
+    private final TransactionTypeRepository repo;
 
-	public TransactionType getTypeById(long id) throws NotFoundException {
-		if(repo.getOne(id) == null) {
-			throw new NotFoundException("transaction type not found ");
-		}
-		
-		return repo.getOne(id);
-	}
+    @Autowired
+    public TransactionTypeServiceImpl(TransactionTypeRepository repo) {
+        this.repo = repo;
+    }
 
-	public List<TransactionType> getAllTransactionType() {
-		return repo.findAll();
-	}
+    public TransactionType addType(String type) {
+        TransactionType newType = new TransactionType();
+        newType.setTransactionTypeName(type);
+        newType.setCreatedDate(new Date());
+        newType.setUpdatedDate(new Date());
+
+        return repo.save(newType);
+    }
+
+    public TransactionType getTypeById(long id) throws NotFoundException {
+        if (repo.getOne(id).getTransactionTypeId() <= 0) {
+            throw new NotFoundException("transaction type not found ");
+        }
+
+        return repo.getOne(id);
+    }
+
+    public List<TransactionType> getAllTransactionType() {
+        return repo.findAll();
+    }
 
 }

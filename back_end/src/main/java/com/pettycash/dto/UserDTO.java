@@ -6,8 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDTO {
-	private String department;
-	private String name;
-	private String code;
-	private long balance;
+    private String department;
+    private String name;
+    private String code;
+    private long balance;
+    private String role;
 }

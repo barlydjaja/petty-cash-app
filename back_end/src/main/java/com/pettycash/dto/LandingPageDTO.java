@@ -10,12 +10,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LandingPageDTO {
-	
-	private String name;
-	private long startBalance;
-	private String code;
-	private String department;
-	List<Transaction> transaction;
-	private long total;
-	
+
+    private String name;
+    private long startBalance;
+    private String code;
+    private String department;
+    List<Transaction> transaction;
+    private long total;
+
 }

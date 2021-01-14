@@ -6,5 +6,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class TransactionTypeDTO {
-	private String name;
+    private String name;
 }

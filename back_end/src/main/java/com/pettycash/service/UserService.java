@@ -13,4 +13,8 @@ public interface UserService {
     void updateUserBalance(long userId, long amount);
 
     void updateUser(User user, long amount);
+
+    User getUserByUsername(String username);
+
+    User changePassword(long userId, String password);
 }

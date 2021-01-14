@@ -1,6 +1,7 @@
 package com.pettycash.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pettycash.dto.UserDTO;
@@ -9,14 +10,17 @@ import com.pettycash.repository.UserRepository;
 import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
+import sun.security.util.Password;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repo;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository repo) {
+    public UserServiceImpl(UserRepository repo, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.repo = repo;
     }
 
@@ -25,8 +29,9 @@ public class UserServiceImpl implements UserService {
         newUser.setStartBalance(details.getBalance());
         newUser.setCode(details.getCode());
         newUser.setDepartment(details.getDepartment());
-        newUser.setName(details.getName());
+        newUser.setUsername(details.getName());
         newUser.setAccountBalance(details.getBalance());
+        newUser.setRole(details.getRole());
 
         return repo.save(newUser);
     }
@@ -48,5 +53,18 @@ public class UserServiceImpl implements UserService {
     public void updateUser(User user, long amount) {
         user.setAccountBalance(amount);
         repo.save(user);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return repo.findByUsername(username);
+    }
+
+    @Override
+    public User changePassword(long userId, String password) {
+        User user = repo.getOne(userId);
+        user.setPassword(passwordEncoder.encode(password));
+
+        return repo.save(user);
     }
 }

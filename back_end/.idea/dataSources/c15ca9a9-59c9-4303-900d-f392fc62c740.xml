@@ -1018,11 +1018,19 @@ SELECT|sys.sys_config
       <Position>6</Position>
       <DataType>bigint|0s</DataType>
     </column>
-    <column id="310" parent="287" name="start_balance">
+    <column id="310" parent="287" name="role">
       <Position>7</Position>
-      <DataType>bigint|0s</DataType>
+      <DataType>varchar(255)|0s</DataType>
     </column>
-    <key id="311" parent="287" name="PRIMARY">
+    <column id="311" parent="287" name="email">
+      <Position>8</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="312" parent="287" name="password">
+      <Position>9</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <key id="313" parent="287" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>user_id</ColNames>
       <Primary>1</Primary>

@@ -29,7 +29,7 @@ import com.pettycash.service.UserService;
 import javassist.NotFoundException;
 
 @RestController
-@RequestMapping("/add")
+@RequestMapping("/v1/add")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -55,7 +55,6 @@ public class TransactionController {
     }
 
     @PostMapping("/user")
-    @CrossOrigin
     public ResponseEntity<User> addNewUser(@RequestBody UserDTO userDTO) {
         User user = userService.addUser(userDTO);
 
@@ -63,7 +62,6 @@ public class TransactionController {
     }
 
     @PostMapping("/transactionType")
-    @CrossOrigin
     public ResponseEntity<TransactionType> addNewTransactionType(@RequestBody TransactionTypeDTO name) {
         TransactionType type = transactionTypeService.addType(name.getName());
 
@@ -71,41 +69,46 @@ public class TransactionController {
     }
 
     @GetMapping("/delete-transaction")
-    @CrossOrigin
     public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long transactionId, HttpServletRequest request) {
-        HttpStatus status = null;
+        HttpStatus status;
         GeneralResponse response = new GeneralResponse();
         boolean result = transactionService.deleteTransaction(transactionId);
-        setResponse(response, result, request, status);
+
+        if(result){
+            status = HttpStatus.OK;
+        } else status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        setResponse(response, result, request);
 
         return new ResponseEntity<>(response, status);
     }
 
     @PostMapping("/update-transaction")
     public ResponseEntity<GeneralResponse> updateTransaction(@RequestParam long transactionId, @RequestBody TransactionDTO transactionDTO, HttpServletRequest request) throws NotFoundException {
-        HttpStatus status = null;
+        HttpStatus status;
         GeneralResponse response = new GeneralResponse();
         boolean result = transactionService.updateTransaction(transactionId, transactionDTO, transactionDTO.getUserId());
 
-        setResponse(response, result, request, status);
+        if(result){
+            status = HttpStatus.OK;
+        } else status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        setResponse(response, result, request);
 
         return new ResponseEntity<>(response, status);
     }
 
-    private void setResponse(GeneralResponse response, boolean result, HttpServletRequest request, HttpStatus status) {
-
+    private void setResponse(GeneralResponse response, boolean result, HttpServletRequest request) {
         if (result) {
             response.setPath(request.getRequestURI());
             response.setResponse("200");
             response.setMessage("SUCCESS");
             response.setDate(new Date());
-            status = HttpStatus.OK;
         } else {
             response.setPath(request.getRequestURI());
             response.setResponse("500");
             response.setMessage("INTERNAL SERVER ERROR");
             response.setDate(new Date());
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }
 }

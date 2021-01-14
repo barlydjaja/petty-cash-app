@@ -38,8 +38,24 @@ public class User implements Serializable{
 	private long startBalance;
 	
 	@Column(name = "user_name")
-	private String name;
+	private String username;
 	
 	@Column(name = "account_balance")
 	private long accountBalance;
+
+	@Column(name = "role")
+	private String role;
+
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "password")
+	private String password;
+
+	public User(User user) {
+	}
+
+	public User() {
+
+	}
 }

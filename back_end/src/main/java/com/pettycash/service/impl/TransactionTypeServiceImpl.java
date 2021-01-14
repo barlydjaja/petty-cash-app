@@ -15,8 +15,12 @@ import javassist.NotFoundException;
 @Service
 public class TransactionTypeServiceImpl implements TransactionTypeService {
 
+    private final TransactionTypeRepository repo;
+
     @Autowired
-    private TransactionTypeRepository repo;
+    public TransactionTypeServiceImpl(TransactionTypeRepository repo) {
+        this.repo = repo;
+    }
 
     public TransactionType addType(String type) {
         TransactionType newType = new TransactionType();

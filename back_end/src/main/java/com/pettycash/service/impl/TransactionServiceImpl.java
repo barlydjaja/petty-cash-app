@@ -68,7 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
         result.setDepartment(user.getDepartment());
         result.setStartBalance(user.getStartBalance());
         result.setTransaction(transaction);
-        result.setName(user.getName());
+        result.setName(user.getUsername());
 
         long temp = user.getStartBalance();
 

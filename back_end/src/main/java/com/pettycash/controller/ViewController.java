@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,13 +27,14 @@ import com.pettycash.service.UserService;
 import javassist.NotFoundException;
 
 @RestController
-@RequestMapping("/view")
+@RequestMapping("/v1/view")
 public class ViewController {
 
     private final TransactionService transactionService;
     private final TransactionTypeService transactionTypeService;
     private final UserService userService;
 
+    @Autowired
     public ViewController(TransactionService transactionService, TransactionTypeService transactionTypeService, UserService userService) {
         this.transactionService = transactionService;
         this.transactionTypeService = transactionTypeService;
@@ -40,7 +42,6 @@ public class ViewController {
     }
 
     @GetMapping("/getAllByUserId")
-    @CrossOrigin
     public ResponseEntity<LandingPageDTO> getTransactionByUserId(@RequestParam("userId") long userId) throws NotFoundException {
         User user = userService.getUserById(userId);
         List<Transaction> transaction = transactionService.getAllByUser(user);
@@ -50,7 +51,6 @@ public class ViewController {
     }
 
     @GetMapping("/getTransactionType")
-    @CrossOrigin
     public ResponseEntity<List<TransactionType>> getTransactionType() {
         List<TransactionType> result = transactionTypeService.getAllTransactionType();
 
@@ -58,7 +58,6 @@ public class ViewController {
     }
 
     @GetMapping("/getTransaction")
-    @CrossOrigin
     public ResponseEntity<Map<String, Object>> getTransactionByUserIdWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
         List<Transaction> transactions;
         User user = userService.getUserById(userId);
@@ -69,7 +68,7 @@ public class ViewController {
         transactions = pageTrans.getContent();
 
         Map<String, Object> response = new HashMap<>();
-        response.put("name", user.getName());
+        response.put("name", user.getUsername());
         response.put("code", user.getCode());
         response.put("department", user.getDepartment());
         response.put("transactions", transactions);

@@ -10,4 +10,5 @@ public class UserDTO {
     private String name;
     private String code;
     private long balance;
+    private String role;
 }

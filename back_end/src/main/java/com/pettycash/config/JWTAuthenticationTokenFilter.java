@@ -18,7 +18,7 @@ public class JWTAuthenticationTokenFilter extends AbstractAuthenticationProcessi
     } //limit api
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException{
         String header = httpServletRequest.getHeader("Authorization");
 
         if(header==null || !header.startsWith("Bearer ")){

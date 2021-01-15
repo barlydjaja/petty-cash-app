@@ -1,4 +1,13 @@
-8081/pettycash/view/getTransaction?userId=1&page={page} (landing page / view page) (get)
+8081/pettycash/v1/file/upload (post)
+
+8081/pettycash/secured/login (post)
+requestBody =
+{
+    "username" : String,
+    "password" : String
+}
+
+8081/pettycash/v1/view/getTransaction?userId=1&page={page} (landing page / view page) (get)
 return = 
 {
 	"totalItems": int (total transactions)
@@ -33,7 +42,7 @@ return =
     "currentPage": int (STARTS FROM 0)
 }
 
-8081/pettycash/view/getTransactionType (get)
+8081/pettycash/v1/view/getTransactionType (get)
 return =
 {
 	"transactionType" : [
@@ -46,7 +55,7 @@ return =
 			    ]
 }
 
-8081/pettycash/add/addTransaction (post)
+8081/pettycash/v1/add/addTransaction (post)
 requestBody =
 {
 	"description" : String,
@@ -55,7 +64,7 @@ requestBody =
 	"transactionTypeId" : long (get dari api di atas / dropdown),
 	"userId" : long (1)
 }
-8081/pettycash/add/update-transaction?transactionId={transactionId} (post)
+8081/pettycash/v1/add/update-transaction?transactionId={transactionId} (post)
 requestBody =
 {
 	"description" : String,
@@ -65,7 +74,7 @@ requestBody =
 	"receipt" : String ("income"/"outcome")
 }
 
-8081/pettycash/add/delete-transaction?transactionId={transactionId} (get)
+8081/pettycash/v1/add/delete-transaction?transactionId={transactionId} (get)
 return =
 {
 	"response": String,

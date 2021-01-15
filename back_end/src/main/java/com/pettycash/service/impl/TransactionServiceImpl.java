@@ -237,4 +237,16 @@ public class TransactionServiceImpl implements TransactionService {
         return result;
     }
 
+    @Override
+    public Transaction getById(long transactionId) {
+        return repo.getOne(transactionId);
+    }
+
+    @Override
+    public void updateTransactionImageName(Transaction transaction, String name) {
+        transaction.setFileName(name);
+        repo.save(transaction);
+    }
+
+
 }

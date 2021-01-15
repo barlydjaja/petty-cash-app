@@ -26,6 +26,7 @@ import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/v1/view")
 public class ViewController {
@@ -42,6 +43,7 @@ public class ViewController {
     }
 
     @GetMapping("/getAllByUserId")
+    @CrossOrigin
     public ResponseEntity<LandingPageDTO> getTransactionByUserId(@RequestParam("userId") long userId) throws NotFoundException {
         User user = userService.getUserById(userId);
         List<Transaction> transaction = transactionService.getAllByUser(user);
@@ -51,6 +53,7 @@ public class ViewController {
     }
 
     @GetMapping("/getTransactionType")
+    @CrossOrigin
     public ResponseEntity<List<TransactionType>> getTransactionType() {
         List<TransactionType> result = transactionTypeService.getAllTransactionType();
 
@@ -58,7 +61,10 @@ public class ViewController {
     }
 
     @GetMapping("/getTransaction")
+    @CrossOrigin
     public ResponseEntity<Map<String, Object>> getTransactionByUserIdWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
+
+        System.out.println("get trans");
         List<Transaction> transactions;
         User user = userService.getUserById(userId);
         Pageable paging = PageRequest.of(page, 10);

@@ -55,5 +55,8 @@ public class Transaction implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
+
+	@Column(name = "picture_name")
+	private String fileName;
 	
 }

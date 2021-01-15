@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JWTValidator {
-    private final String secret = "PETTYCASH";
+    private static final String secret = "PETTYCASH";
 
     public LoginDTO validate(String token) {
 
@@ -24,7 +24,7 @@ public class JWTValidator {
             userDomain.setPassword((String)body.get("password"));
         }
         catch (Exception e){
-            System.out.println(e);
+            System.out.println(e.toString());
         }
 
         return userDomain;

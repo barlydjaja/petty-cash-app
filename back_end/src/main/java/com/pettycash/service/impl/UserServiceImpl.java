@@ -24,16 +24,20 @@ public class UserServiceImpl implements UserService {
         this.repo = repo;
     }
 
-    public User addUser(UserDTO details) {
+    public User addUser(UserDTO details) throws Exception {
         User newUser = new User();
-        newUser.setStartBalance(details.getBalance());
-        newUser.setCode(details.getCode());
-        newUser.setDepartment(details.getDepartment());
-        newUser.setUsername(details.getName());
-        newUser.setAccountBalance(details.getBalance());
-        newUser.setRole(details.getRole());
+        if (repo.findByUsername(details.getName()) == null) {
 
-        return repo.save(newUser);
+            newUser.setStartBalance(details.getBalance());
+            newUser.setCode(details.getCode());
+            newUser.setDepartment(details.getDepartment());
+            newUser.setUsername(details.getName());
+            newUser.setAccountBalance(details.getBalance());
+            newUser.setRole(details.getRole());
+            repo.save(newUser);
+        } else throw new Exception("user with the same username exists");
+
+        return newUser;
     }
 
     public User getUserById(long userId) throws NotFoundException {

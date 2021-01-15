@@ -25,4 +25,8 @@ public interface TransactionService {
     boolean deleteTransaction(long transactionId);
 
     boolean updateTransaction(long transactionId, TransactionDTO dto, long userId) throws NotFoundException;
+
+    Transaction getById(long transactionId);
+
+    void updateTransactionImageName(Transaction transaction, String name);
 }

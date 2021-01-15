@@ -28,6 +28,7 @@ import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/v1/add")
 public class TransactionController {
@@ -55,13 +56,15 @@ public class TransactionController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<User> addNewUser(@RequestBody UserDTO userDTO) {
+    @CrossOrigin
+    public ResponseEntity<User> addNewUser(@RequestBody UserDTO userDTO) throws Exception {
         User user = userService.addUser(userDTO);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/transactionType")
+    @CrossOrigin
     public ResponseEntity<TransactionType> addNewTransactionType(@RequestBody TransactionTypeDTO name) {
         TransactionType type = transactionTypeService.addType(name.getName());
 
@@ -69,6 +72,7 @@ public class TransactionController {
     }
 
     @GetMapping("/delete-transaction")
+    @CrossOrigin
     public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long transactionId, HttpServletRequest request) {
         HttpStatus status;
         GeneralResponse response = new GeneralResponse();
@@ -84,6 +88,7 @@ public class TransactionController {
     }
 
     @PostMapping("/update-transaction")
+    @CrossOrigin
     public ResponseEntity<GeneralResponse> updateTransaction(@RequestParam long transactionId, @RequestBody TransactionDTO transactionDTO, HttpServletRequest request) throws NotFoundException {
         HttpStatus status;
         GeneralResponse response = new GeneralResponse();

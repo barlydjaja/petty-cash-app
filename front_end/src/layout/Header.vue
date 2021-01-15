@@ -25,14 +25,45 @@
             <b-navbar-nav class="ml-auto text-coloring">
               <div class="mx-3 text-config">Tentang</div>
               <router-link to="/demo">
-                <div class="mx-3 text-config">
+                <div class="mx-3 text-config" v-if="!isLogin()">
                   Demo
                 </div>
               </router-link>
-              <div class="mx-3 text-config">
+
+              <div class="mx-3 text-config" v-if="!isLogin()">
                 <Login />
               </div>
-              <div class="mx-3 text-config">Register</div>
+              <div class="mx-3 text-config" v-if="!isLogin()">Register</div>
+              <div class="mx-3 text-config" v-if="isLogin()">
+                <!-- welcome back {{ username }} -->
+                <div class="dropdown">
+                  <button
+                    class="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Dropdown button
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mx-3 text-config btn"
+                v-if="isLogin()"
+                @click="handleLogout"
+              >
+                Logout
+              </div>
             </b-navbar-nav>
           </b-collapse>
         </b-navbar>
@@ -45,8 +76,29 @@
 import Login from "../components/Login";
 export default {
   name: "Header",
+  data() {
+    return {
+      username: "",
+    };
+  },
   components: {
     Login,
+  },
+  methods: {
+    isLogin() {
+      if (localStorage.getItem("token") === null) return false;
+      else return true;
+    },
+
+    handleLogout() {
+      localStorage.clear();
+      console.log(localStorage.getItem("token"));
+      // this.$router.push("/");
+      this.$forceUpdate();
+    },
+  },
+  created() {
+    this.username = localStorage.getItem("username");
   },
 };
 </script>

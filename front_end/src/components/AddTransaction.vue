@@ -1,13 +1,17 @@
 <template>
   <div class="text-center align-center">
     <div>
-      <b-button v-b-modal.modal-prevent-closing class="transaction"
+      <b-button v-b-modal.modal-prevent-closing-2 class="transaction"
         >Tambah Transaksi</b-button
       >
 
       <!-- Submitted Names: -->
 
-      <b-modal id="modal-prevent-closing" ref="modal" title="Masukan Transaksi">
+      <b-modal
+        id="modal-prevent-closing-2"
+        ref="modal"
+        title="Masukan Transaksi"
+      >
         <div>
           <b-form @submit="onSubmit" @reset="onReset" v-if="show">
             <b-form-group
@@ -113,14 +117,22 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      const url = "http://10.69.72.89:8081/pettycash/add/addTransaction";
+      console.log(localStorage.getItem("token"));
+      const url = "http://10.69.72.89:8081/pettycash/v1/add/addTransaction";
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
       console.log(this.form);
       axios
-        .post(url, this.form)
+        .post(url, this.form, config)
         .then((res) => console.log(res.data))
         .catch((err) => console.log(err));
       // alert(JSON.stringify(this.form));
       // console.log(this.form);
+      this.$bvModal.hide("modal-prevent-closing-2");
+      this.$forceUpdate();
     },
     onReset(event) {
       event.preventDefault();

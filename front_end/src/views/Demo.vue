@@ -1,7 +1,7 @@
 <template>
   <div class="background">
     <Header />
-    <b-container class="my-5 vh-100">
+    <b-container class="my-5 ">
       <b-jumbotron class="pt-4">
         <b-row class="align-items-center">
           <b-col sm="9">
@@ -26,9 +26,6 @@
           <b-col class="date">Deskripsi</b-col>
           <b-col class="income-expenses">mutasi</b-col>
           <b-col class="ending-balance">Sisa Saldo</b-col>
-          <b-col>
-            <b-row sm="3"></b-row>
-          </b-col>
         </b-row>
 
         <Transactions v-bind:userTransactions="userTransactions" />
@@ -91,22 +88,32 @@ export default {
   },
 
   created() {
-    let page = this.pages;
-    // console.log(this.pages);
-    if (this.pages === 0) page = 0;
-    axios
-      .get(
-        `http://10.69.72.89:8081/pettycash/view/getTransaction?userId=1&page=${page}`
-      )
-      .then((res) => {
-        this.userData = res.data;
-        this.userTransactions = res.data.transactions;
-        this.accountBalance = res.data.transactions[0].user.accountBalance;
-        this.totalItems = res.data.totalItems;
-        console.log(res.data);
-        console.log(res.data.transactions);
-      })
-      .catch((err) => console.log(err));
+    // console.log("user role is: " + localStorage.getItem("role"));
+    // console.log("user id is: " + localStorage.getItem("userId"));
+
+    if (localStorage.getItem("token")) {
+      let page = this.pages;
+      // console.log(this.pages);
+      if (this.pages === 0) page = 0;
+
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/getTransaction?userId=1&page=${page}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      axios
+        .get(url, config)
+        .then((res) => {
+          this.userData = res.data;
+          this.userTransactions = res.data.transactions;
+          this.accountBalance = res.data.transactions[0].user.accountBalance;
+          this.totalItems = res.data.totalItems;
+          console.log(res.data);
+          console.log(res.data.transactions);
+        })
+        .catch((err) => console.log(err));
+    }
   },
 };
 </script>

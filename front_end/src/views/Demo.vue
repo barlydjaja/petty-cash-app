@@ -1,12 +1,12 @@
 <template>
   <div class="background">
     <Header />
-    <b-container class="my-5">
+    <b-container class="my-5 vh-100">
       <b-jumbotron class="pt-4">
         <b-row class="align-items-center">
           <b-col sm="9">
             <div class="username font-weight-bold">
-              Username: {{ userData.name }}
+              Username: {{ userData.username }}
             </div>
             <br />
             <div class="balance">
@@ -20,24 +20,24 @@
         </b-row>
 
         <div class="new-transaction mt-2">Transaksi Baru</div>
-        <b-row class="mt-3">
+        <b-row class="mt-3 font-weight-bold">
           <b-col class="number" sm="2"> Tanggal </b-col>
           <b-col class="transaction" sm="2">Transaksi</b-col>
           <b-col class="date">Deskripsi</b-col>
           <b-col class="income-expenses">mutasi</b-col>
           <b-col class="ending-balance">Sisa Saldo</b-col>
-          <b-col sm="1"></b-col>
+          <b-col>
+            <b-row sm="3"></b-row>
+          </b-col>
         </b-row>
 
         <Transactions v-bind:userTransactions="userTransactions" />
-        <b-row class="justify-content-center">
-          <b-col>
-            <jw-pagination
-              :items="userTransactions"
-              @changePage="onChangePage"
-            />
-          </b-col>
-        </b-row>
+        <div class="text-center">
+          <Pagination
+            v-bind:nextPage="{ nextPage }"
+            v-bind:prevPage="{ prevPage }"
+          />
+        </div>
       </b-jumbotron>
     </b-container>
 
@@ -51,7 +51,7 @@ import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import Transactions from "../components/Transactions";
 import AddTransaction from "../components/AddTransaction";
-// import Pagination from "vue-pagination-2";
+import Pagination from "../components/Pagination";
 
 export default {
   name: "Demo",
@@ -60,7 +60,7 @@ export default {
     Footer,
     Transactions,
     AddTransaction,
-    // Pagination,
+    Pagination,
   },
   data() {
     return {
@@ -68,14 +68,35 @@ export default {
       userTransactions: [],
       totalItems: 0,
       accountBalance: 0,
-      page: 1,
+      pages: 0,
+      totalPages: 1,
     };
   },
 
+  methods: {
+    nextPage: function(e) {
+      let currentPage = this.pages;
+      if (this.pages < this.totalPages) {
+        let nextPage = currentPage + 1;
+        this.pages = nextPage;
+      }
+      e.preventDefault();
+      console.log("next page");
+    },
+
+    prevPage: function(e) {
+      e.preventDefault();
+      console.log("prev page");
+    },
+  },
+
   created() {
+    let page = this.pages;
+    // console.log(this.pages);
+    if (this.pages === 0) page = 0;
     axios
       .get(
-        "http://10.69.72.89:8081/pettycash/view/getTransaction?userId=1&page=0"
+        `http://10.69.72.89:8081/pettycash/view/getTransaction?userId=1&page=${page}`
       )
       .then((res) => {
         this.userData = res.data;

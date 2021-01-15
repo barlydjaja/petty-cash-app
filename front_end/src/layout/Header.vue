@@ -29,7 +29,9 @@
                   Demo
                 </div>
               </router-link>
-              <div class="mx-3 text-config">Login</div>
+              <div class="mx-3 text-config">
+                <Login />
+              </div>
               <div class="mx-3 text-config">Register</div>
             </b-navbar-nav>
           </b-collapse>
@@ -40,8 +42,12 @@
 </template>
 
 <script>
+import Login from "../components/Login";
 export default {
   name: "Header",
+  components: {
+    Login,
+  },
 };
 </script>
 

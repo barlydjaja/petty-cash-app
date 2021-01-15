@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -28,11 +27,14 @@ import java.util.Collections;
 @Configuration
 public class JWTConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JWTAuthenticationProvider authenticationProvider;
+    private final JWTAuthenticationProvider authenticationProvider;
+    private final JWTAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private JWTAuthenticationEntryPoint authenticationEntryPoint;
+    public JWTConfig(JWTAuthenticationProvider authenticationProvider, JWTAuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationProvider = authenticationProvider;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager() {
@@ -47,13 +49,14 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/secured/**").permitAll()
+                .authorizeRequests().antMatchers("/v1/**").permitAll()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
 
         http.headers().cacheControl();
     }
@@ -67,6 +70,7 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
+    @SuppressWarnings("unused")
     private PasswordEncoder getPasswordEncoder() {
         return new PasswordEncoder() {
             @Override
@@ -84,9 +88,9 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Collections.singletonList("*"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

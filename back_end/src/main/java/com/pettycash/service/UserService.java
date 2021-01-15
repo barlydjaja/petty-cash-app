@@ -6,7 +6,7 @@ import com.pettycash.entity.User;
 import javassist.NotFoundException;
 
 public interface UserService {
-    User addUser(UserDTO details);
+    User addUser(UserDTO details) throws Exception;
 
     User getUserById(long userId) throws NotFoundException;
 

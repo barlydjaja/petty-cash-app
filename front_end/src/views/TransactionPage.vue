@@ -1,12 +1,12 @@
 <template>
   <div class="background">
     <Header />
-    <b-container class="my-5 vh-75">
+    <b-container class="my-5 ">
       <b-jumbotron class="pt-4">
         <b-row class="align-items-center">
           <b-col sm="9">
             <div class="username font-weight-bold">
-              Username: {{ userData.role }}
+              Username: {{ userData.name }}
             </div>
             <br />
             <div class="balance">
@@ -26,11 +26,11 @@
           <b-col class="date" sm="2">Deskripsi</b-col>
           <b-col class="income-expenses" sm="2">mutasi</b-col>
           <b-col class="ending-balance" sm="2">Sisa Saldo</b-col>
-          <b-col sm="2"></b-col>
+          <b-col></b-col>
         </b-row>
 
         <Transactions v-bind:userTransactions="userTransactions" />
-        <div class="text-center">
+        <div class="text-center ">
           <pagination
             v-model="pages"
             :records="totalItems"
@@ -130,14 +130,13 @@ export default {
 };
 </script>
 
-<style lang="css" scoped>
-.username,
+<style lang="css">
 .balance {
   font-size: 1.25em;
   display: inline;
 }
 
-.vh-75 {
-  min-height: 75vh !important;
+.pagination {
+  justify-content: center;
 }
 </style>

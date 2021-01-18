@@ -4,7 +4,7 @@
       <b-col>
         <button
           class="btn btn-primary"
-          @click="$emit('prevPage')"
+          @click="$emit('prev-page')"
           aria-label="Previous"
         >
           Back
@@ -13,7 +13,7 @@
       <b-col>
         <button
           class="btn btn-primary"
-          @click="$emit('nextPage')"
+          @click="$emit('next-page')"
           aria-label="Next"
         >
           Next

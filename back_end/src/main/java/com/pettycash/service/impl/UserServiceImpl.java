@@ -1,6 +1,10 @@
 package com.pettycash.service.impl;
 
+import com.pettycash.en.Const;
+import com.pettycash.entity.Role;
+import com.pettycash.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +16,19 @@ import com.pettycash.service.UserService;
 import javassist.NotFoundException;
 import sun.security.util.Password;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repo;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Autowired
-    public UserServiceImpl(UserRepository repo, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository repo, PasswordEncoder passwordEncoder, RoleService roleService) {
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.repo = repo;
     }
@@ -33,7 +42,17 @@ public class UserServiceImpl implements UserService {
             newUser.setDepartment(details.getDepartment());
             newUser.setUsername(details.getName());
             newUser.setAccountBalance(details.getBalance());
-            newUser.setRole(details.getRole());
+
+            Role role = roleService.getByName(Const.STAFF);
+            Set<Role> roleSet = new HashSet<>();
+            roleSet.add(role);
+
+            if(details.getName().equalsIgnoreCase(Const.ADMIN)){
+                roleSet.add(roleService.getByName(Const.ADMIN));
+            }
+
+            newUser.setRoles(roleSet);
+
             repo.save(newUser);
         } else throw new Exception("user with the same username exists");
 

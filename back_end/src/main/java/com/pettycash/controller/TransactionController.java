@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,6 +104,13 @@ public class TransactionController {
         return new ResponseEntity<>(response, status);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_admin')")
+    @GetMapping("/admin/approveTransaction")
+    public ResponseEntity<Transaction> approveTransaction(@RequestParam long userId, @RequestParam long transactionId){
+        Transaction transaction = transactionService.approveTransaction(transactionId);
+        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    }
+
     private void setResponse(GeneralResponse response, boolean result, HttpServletRequest request) {
         if (result) {
             response.setPath(request.getRequestURI());
@@ -116,4 +124,5 @@ public class TransactionController {
             response.setDate(new Date());
         }
     }
+
 }

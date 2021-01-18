@@ -29,4 +29,8 @@ public interface TransactionService {
     Transaction getById(long transactionId);
 
     void updateTransactionImageName(Transaction transaction, String name);
+
+    List<Transaction> getAllByUserAndIsApproved(User user, String isApproved);
+
+    Transaction approveTransaction(long transactionId);
 }

@@ -37,15 +37,15 @@ public class LoginServiceImpl implements LoginService {
 
         else{
             loginDTO.setUserId(userTable.getUserId());
-            JWTAuthenticationToken jwtAuthenticationToken = new JWTAuthenticationToken(jwtGenerator.generate(loginDTO));
             loginDTO.setUsername(userTable.getUsername());
-            jwtAuthenticationToken.setToken(jwtGenerator.generate(loginDTO));
+            loginDTO.setRole(userTable.getRoles());
+            JWTAuthenticationToken jwtAuthenticationToken = new JWTAuthenticationToken(jwtGenerator.generate(loginDTO));
 
             String payload = jwtAuthenticationToken.getToken();
             TokenDTO loginDomain = new TokenDTO();
             loginDomain.setToken(payload);
             loginDomain.setUserId(userTable.getUserId());
-            loginDomain.setRole(userTable.getRole());
+            loginDomain.setRole(userTable.getRoles());
             return loginDomain;
         }
     }

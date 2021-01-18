@@ -1,5 +1,6 @@
 package com.pettycash.config;
 
+import com.pettycash.en.Const;
 import com.pettycash.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +51,8 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/v1/**").permitAll()
+                .and()
+                .authorizeRequests().antMatchers("/**/admin/**").hasRole("admin")
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()

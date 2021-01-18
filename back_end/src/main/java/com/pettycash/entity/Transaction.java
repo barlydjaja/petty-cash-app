@@ -58,5 +58,8 @@ public class Transaction implements Serializable{
 
 	@Column(name = "picture_name")
 	private String fileName;
+
+	@Column(name = "is_approved", columnDefinition = "varchar(50) default 'not_approved'")
+	private String isApproved;
 	
 }

@@ -1,36 +1,52 @@
 package com.pettycash.dto;
 
+import com.pettycash.entity.Role;
 import com.pettycash.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-public class JwtUserDetails extends User implements UserDetails {
+@Getter
+@Setter
+public class JwtUserDetails implements UserDetails {
 
+    private User user;
     private String name;
     private String token;
     private long userId;
 
     public JwtUserDetails(User user) {
-        super(user);
+        this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+//        Set<Role> roles = user.getRoles();
+//        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//
+//        for(Role role : roles){
+//            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+//        }
+//        return authorities;
+
         return null;
     }
 
     @Override
     public String getPassword() {
-        return super.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return super.getUsername();
+        return user.getUsername();
     }
 
     @Override

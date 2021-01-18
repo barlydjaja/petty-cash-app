@@ -14,4 +14,5 @@ import com.pettycash.entity.User;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>{
 	List<Transaction> findAllByUserOrderByTransactionDateAsc(User user);
 	Page<Transaction> findByUserOrderByTransactionDateAsc(User user, Pageable pageable);
+	List<Transaction> findAllByUserAndIsApprovedOrderByTransactionDateAsc(User user, String isApproved);
 }

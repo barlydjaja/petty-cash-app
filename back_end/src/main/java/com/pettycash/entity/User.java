@@ -1,13 +1,10 @@
 package com.pettycash.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -43,8 +40,14 @@ public class User implements Serializable{
 	@Column(name = "account_balance")
 	private long accountBalance;
 
-	@Column(name = "role")
-	private String role;
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "user_role",
+			joinColumns = {
+					@JoinColumn(name = "user_id")
+			},
+			inverseJoinColumns = {
+					@JoinColumn(name = "role_id") })
+	private Set<Role> roles;
 
 	@Column(name = "email")
 	private String email;
@@ -53,6 +56,7 @@ public class User implements Serializable{
 	private String password;
 
 	public User(User user) {
+
 	}
 
 	public User() {

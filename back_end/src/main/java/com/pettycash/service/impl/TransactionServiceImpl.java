@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.pettycash.en.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +23,6 @@ import com.pettycash.service.UserService;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    private static final String INCOME = "income";
-    private static final String OUTCOME = "outcome";
-
     private final TransactionRepository repo;
     private final UserService userService;
     private final TransactionTypeService typeService;
@@ -40,11 +38,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction newTransaction = new Transaction();
 
-        if (dto.getReceipt().equalsIgnoreCase(INCOME)) {
-            newTransaction.setReceipt(INCOME);
+        if (dto.getReceipt().equalsIgnoreCase(Const.INCOME)) {
+            newTransaction.setReceipt(Const.INCOME);
             newTransaction.setAmount(dto.getAmount());
         } else {
-            newTransaction.setReceipt(OUTCOME);
+            newTransaction.setReceipt(Const.OUTCOME);
             newTransaction.setAmount(toNegative(dto.getAmount()));
         }
 
@@ -246,6 +244,21 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateTransactionImageName(Transaction transaction, String name) {
         transaction.setFileName(name);
         repo.save(transaction);
+    }
+
+    @Override
+    public List<Transaction> getAllByUserAndIsApproved(User user, String isApproved) {
+        return null;
+    }
+
+    @Override
+    public Transaction approveTransaction(long transactionId) {
+        Transaction transaction = repo.getOne(transactionId);
+        if(transaction.getIsApproved().equalsIgnoreCase(Const.NOT_APPROVED)) {
+            transaction.setIsApproved(Const.APPROVED);
+        }
+        repo.save(transaction);
+        return transaction;
     }
 
 

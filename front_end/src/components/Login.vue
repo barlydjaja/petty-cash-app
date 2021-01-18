@@ -1,70 +1,108 @@
 <template>
   <div>
-    <b-button
-      onclick="document.getElementById('id01').style.display='block'"
-      style="width:auto;"
-    >
-      Login
-    </b-button>
+    <div>
+      <span v-b-modal.modal-prevent-closing>Login</span>
 
-    <div id="id01" class="modal">
-      <form
-        class="modal-content animate"
-        action="/action_page.php"
-        method="post"
+      <b-modal
+        id="modal-prevent-closing"
+        ref="modal"
+        title="Login Form"
+        @show="resetModal"
+        @hidden="resetModal"
+        @ok="handleOk"
       >
-        <div class="imgcontainer">
-          <span
-            onclick="document.getElementById('id01').style.display='none'"
-            class="close"
-            title="Close Modal"
-            >&times;</span
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+          <b-form-group
+            label="Username"
+            label-for="username-input"
+            invalid-feedback="username is required"
+            :state="nameState"
           >
-          <img src="img_avatar2.png" alt="Avatar" class="avatar" />
-        </div>
-
-        <div class="container">
-          <label for="uname"><b>Username</b></label>
-          <input
-            type="text"
-            placeholder="Enter Username"
-            name="uname"
-            required
-          />
-
-          <label for="psw"><b>Password</b></label>
-          <input
-            type="password"
-            placeholder="Enter Password"
-            name="psw"
-            required
-          />
-
-          <button type="submit">Login</button>
-          <label>
-            <input type="checkbox" checked="checked" name="remember" /> Remember
-            me
-          </label>
-        </div>
-
-        <div class="container" style="background-color:#f1f1f1">
-          <button
-            type="button"
-            onclick="document.getElementById('id01').style.display='none'"
-            class="cancelbtn"
+            <b-form-input
+              id="username-input"
+              v-model="form.username"
+              :state="nameState"
+              required
+            ></b-form-input>
+          </b-form-group>
+        </form>
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+          <b-form-group
+            label="password"
+            label-for="password-input"
+            invalid-feedback="password is required"
+            :state="nameState"
           >
-            Cancel
-          </button>
-          <span class="psw">Forgot <a href="#">password?</a></span>
-        </div>
-      </form>
+            <b-form-input
+              id="password-input"
+              v-model="form.password"
+              :state="nameState"
+              required
+            ></b-form-input>
+          </b-form-group>
+        </form>
+        <!-- <b-card class="mt-3" header="Form Data Result">
+          <pre class="m-0">{{ form }}</pre>
+        </b-card> -->
+      </b-modal>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Login",
+  data() {
+    return {
+      form: {},
+      username: "",
+      password: "",
+      nameState: null,
+    };
+  },
+  methods: {
+    checkFormValidity() {
+      const valid = this.$refs.form.checkValidity();
+      this.nameState = valid;
+      return valid;
+    },
+    resetModal() {
+      this.name = "";
+      this.nameState = null;
+    },
+    handleOk(bvModalEvt) {
+      // Prevent modal from closing
+      bvModalEvt.preventDefault();
+      // Trigger submit handler
+      this.handleSubmit();
+    },
+    handleSubmit() {
+      // Exit when the form isn't valid
+      if (!this.checkFormValidity()) {
+        return;
+      }
+      // Post to server
+      const url = "http://10.69.72.89:8081/pettycash/secured/login";
+      axios
+        .post(url, this.form)
+        .then((res) => {
+          console.log(res.data);
+          localStorage.setItem("role", res.data.role);
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("userId", res.data.userId);
+          localStorage.setItem("username", this.form.username);
+          console.log(this.$router.path);
+          // if (this.$router.path !== "/demo") this.$router.push("/demo");11
+        })
+        .then(this.$forceUpdate());
+      // Hide the modal manually
+      this.$nextTick(() => {
+        this.$bvModal.hide("modal-prevent-closing");
+      });
+    },
+  },
 };
 </script>
 
@@ -84,15 +122,17 @@ input[type="password"] {
   box-sizing: border-box;
 }
 
+.btn {
+  color: #fdcb5a;
+  font-size: 1.05em;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 /* Set a style for all buttons */
 button {
   color: #fdcb5a;
   cursor: pointer;
-}
-
-.btn-secondary {
-  background-color: none;
-  border-color: none;
 }
 
 button:hover {

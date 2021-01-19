@@ -16,8 +16,12 @@
           <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
               <b-nav-item-dropdown text="Lang" right>
-                <b-dropdown-item href="#">EN</b-dropdown-item>
-                <b-dropdown-item href="#">ID</b-dropdown-item>
+                <b-dropdown-item
+                  v-for="entry in languages"
+                  :key="entry.language"
+                  @click="changeLocale(entry.language)"
+                  >{{ entry.title }}</b-dropdown-item
+                >
               </b-nav-item-dropdown>
             </b-navbar-nav>
 
@@ -114,8 +118,9 @@
 </template>
 
 <script>
-// import Login from "../components/Login";
 import axios from "axios";
+import { i18n } from "../i18n";
+
 export default {
   name: "Header",
   data() {
@@ -124,11 +129,13 @@ export default {
       username: localStorage.getItem("username"),
       password: "",
       nameState: null,
+      languages: [
+        { language: "en", title: "English" },
+        { language: "id", title: "Indonesia" },
+      ],
     };
   },
-  components: {
-    // Login,
-  },
+
   methods: {
     checkFormValidity() {
       const valid = this.$refs.form.checkValidity();
@@ -187,6 +194,10 @@ export default {
       // this.$router.push("/");
       this.$forceUpdate();
       this.$router.go();
+    },
+
+    changeLocale(locale) {
+      i18n.locale = locale;
     },
   },
 };

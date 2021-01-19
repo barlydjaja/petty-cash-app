@@ -74,7 +74,7 @@ export default {
   methods: {
     handlePageChange(pageNumber) {
       console.log(pageNumber);
-      let url = `http://10.69.72.89:8081/pettycash/v1/view/getTransaction?userId=1&page=${pageNumber -
+      let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=1&page=${pageNumber -
         1}`;
       const config = {
         headers: {
@@ -106,8 +106,9 @@ export default {
       let page = this.pages;
       if (this.pages === 0) this.page = 0;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/getTransaction?userId=1&page=${page -
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=1&page=${page -
         1}`;
+
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

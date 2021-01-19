@@ -6,11 +6,11 @@
         <b-row class="align-items-center">
           <b-col sm="9">
             <div class="username font-weight-bold">
-              Username: dumy text
+              Username: {{ userApprovals[0].user.username }}
             </div>
             <br />
             <div class="balance">
-              Current Balance: Rp. 1
+              Current Balance: Rp. {{ userApprovals[0].user.accountBalance }}
             </div>
           </b-col>
         </b-row>
@@ -19,9 +19,10 @@
           <b-col class="number"> Tanggal </b-col>
           <b-col class="transaction">Transaksi</b-col>
           <b-col class="date">Deskripsi</b-col>
-          <b-col class="income-expenses">mutasi</b-col>
+          <b-col class="date">Mutasi</b-col>
           <b-col class="ending-balance">Approval</b-col>
         </b-row>
+        <hr />
 
         <Approvals v-bind:userApprovals="userApprovals" />
       </b-jumbotron>
@@ -34,7 +35,7 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import axios from "axios";
-import Approvals from "../components/Approval";
+import Approvals from "../components/Approvals";
 
 export default {
   name: "Approval",
@@ -47,7 +48,7 @@ export default {
   data() {
     return {
       userData: [],
-      userTransactions: [],
+      userApprovals: [],
       totalItems: 0,
       accountBalance: 0,
       pages: 1,
@@ -62,8 +63,8 @@ export default {
     if (localStorage.getItem("token")) {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/getTransaction?userId=1&page=${0}`;
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,8 +74,7 @@ export default {
         .get(url, config)
         .then((res) => {
           this.userData = res.data;
-          this.userTransactions = res.data.transactions;
-          this.accountBalance = res.data.transactions[0].user.accountBalance;
+          this.userApprovals = res.data.transactions;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
           console.log(res.data);

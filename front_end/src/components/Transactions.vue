@@ -72,7 +72,7 @@
 
       <hr />
     </div>
-    <b-modal id="my-modal" title="Edit Transaksi">
+    <b-modal id="my-modal" title="Edit Transaksi" @ok="onSubmit">
       <div>
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">
           <b-form-group
@@ -210,7 +210,7 @@ export default {
   methods: {
     handleDelete: function(e, id) {
       e.preventDefault();
-      console.log(id);
+      // console.log(id);
       const urlDel = `http://10.69.72.89:8081/pettycash/v1/add/delete-transaction?transactionId=${id}`;
       const config = {
         headers: {
@@ -235,7 +235,7 @@ export default {
     onSubmit(event) {
       event.preventDefault();
       const url = `http://10.69.72.89:8081/pettycash/v1/add/update-transaction?transactionId=${this.transactionId}`;
-      console.log(this.form);
+      // console.log(this.form);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       };
@@ -244,8 +244,8 @@ export default {
         .then((res) => console.log(res.data))
         .catch((err) => console.log(err));
       // alert(JSON.stringify(this.form));
-      console.log(this.form);
-      console.log(this.transactionId);
+      // console.log(this.form);
+      // console.log(this.transactionId);
     },
 
     handleFileUpload() {

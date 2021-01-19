@@ -11,5 +11,5 @@ import java.util.Set;
 public class TokenDTO {
     private long userId;
     private String token;
-    private Set<Role> role;
+    private Role role;
 }

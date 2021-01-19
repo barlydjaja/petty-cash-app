@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.pettycash.en.Const;
+import com.pettycash.exception.RequestNotAllowedException;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,9 +52,13 @@ public class TransactionServiceImpl implements TransactionService {
         newTransaction.setUser(user);
         newTransaction.setTransactionDate(new Date());
         newTransaction.setTransactionType(transactionType);
-        newTransaction.setResidue(user.getAccountBalance() + newTransaction.getAmount());
-        userService.updateUserBalance(user.getUserId(), newTransaction.getAmount());
-
+        newTransaction.setResidue(0);
+        newTransaction.setIsApproved(Const.NOT_APPROVED);
+        if(user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN)) {
+            newTransaction.setResidue(user.getAccountBalance() + newTransaction.getAmount());
+            userService.updateUserBalance(user.getUserId(), newTransaction.getAmount());
+            newTransaction.setIsApproved(Const.APPROVED);
+        }
         return repo.save(newTransaction);
     }
 
@@ -73,6 +79,9 @@ public class TransactionServiceImpl implements TransactionService {
         for (int i = 0; i < transaction.size(); i++) {
             result.getTransaction().get(i).setResidue(temp + result.getTransaction().get(i).getAmount());
             temp = result.getTransaction().get(i).getResidue();
+            if(transaction.get(i).getIsApproved() == null){
+                transaction.get(i).setIsApproved(Const.NOT_APPROVED);
+            }
         }
 
         result.setTotal(temp);
@@ -92,64 +101,69 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public boolean deleteTransaction(long transactionId) {
-        boolean result;
+        boolean result = false;
 
         try {
             User user = userService.getUserById(1);
+            Transaction transaction = repo.getOne(transactionId);
             repo.delete(repo.getOne(transactionId));
-            int flag = 0;
-            Transaction indexMinus1 = null;
-            List<Transaction> looping = repo.findAllByUserOrderByTransactionDateAsc(user);
-            List<Transaction> update = new ArrayList<>();
 
-            //get transaksi2 setelah index transaksi yang sudah dihapus
-            for (int i = 0; i < looping.size(); i++) {
-                if (looping.get(i).getTransactionId() > transactionId) {
-                    if (flag == 0) {
-                        if (i > 0) {
-                            indexMinus1 = looping.get(i - 1); //get 1 transaksi sebelum index transaksi yg dihapus
+            if(transaction.getIsApproved().equalsIgnoreCase(Const.APPROVED)) {
+                int flag = 0;
+                Transaction indexMinus1 = null;
+                List<Transaction> looping = repo.findAllByUserOrderByTransactionDateAsc(user);
+                List<Transaction> update = new ArrayList<>();
+
+                //get transaksi2 setelah index transaksi yang sudah dihapus
+                for (int i = 0; i < looping.size(); i++) {
+                    if (looping.get(i).getTransactionId() > transactionId) {
+                        if (flag == 0) {
+                            if (i > 0) {
+                                indexMinus1 = looping.get(i - 1); //get 1 transaksi sebelum index transaksi yg dihapus
+                            }
+                            update.add(looping.get(i));
+                            flag = 1;
+                        } else update.add(looping.get(i));
+                    }
+                }
+
+                if (indexMinus1 != null) { //looping kalo transaksi yg dihapus bukan index pertama
+                    for (int i = 0; i < update.size(); i++) {
+                        if (i == 0) {
+                            update.get(i).setResidue(indexMinus1.getResidue() + update.get(i).getAmount());
+                        } else {
+                            update.get(i).setResidue(update.get(i - 1).getResidue() + update.get(i).getAmount());
                         }
-                        update.add(looping.get(i));
-                        flag = 1;
-                    } else update.add(looping.get(i));
-                }
-            }
-
-            if (indexMinus1 != null) { //looping kalo transaksi yg dihapus bukan index pertama
-                for (int i = 0; i < update.size(); i++) {
-                    if (i == 0) {
-                        update.get(i).setResidue(indexMinus1.getResidue() + update.get(i).getAmount());
-                    } else {
-                        update.get(i).setResidue(update.get(i - 1).getResidue() + update.get(i).getAmount());
+                        if (update.get(i).getIsApproved().equalsIgnoreCase(Const.APPROVED)) {
+                            repo.save(update.get(i));
+                            if (i == update.size() - 1) {
+                                userService.updateUser(user, update.get(i).getResidue());
+                            }
+                        }
                     }
-
-                    repo.save(update.get(i));
-
-                    if (i == update.size() - 1) {
-                        userService.updateUser(user, update.get(i).getResidue());
-                    }
-                }
-            } else { //looping kalo transaksi yg dihapus ternyata index pertama
-                for (int i = 0; i < update.size(); i++) {
-                    if (i == 0) {
-                        update.get(i).setResidue(user.getStartBalance() + update.get(i).getAmount());
-                    } else {
-                        update.get(i).setResidue(update.get(i - 1).getResidue() + update.get(i).getAmount());
-                    }
-                    repo.save(update.get(i));
-
-                    if (i == update.size() - 1) {
-                        userService.updateUser(user, update.get(i).getResidue());
+                } else { //looping kalo transaksi yg dihapus ternyata index pertama
+                    for (int i = 0; i < update.size(); i++) {
+                        if (i == 0) {
+                            update.get(i).setResidue(user.getStartBalance() + update.get(i).getAmount());
+                        } else {
+                            update.get(i).setResidue(update.get(i - 1).getResidue() + update.get(i).getAmount());
+                        }
+                        if (update.get(i).getIsApproved().equalsIgnoreCase(Const.APPROVED)) {
+                            repo.save(update.get(i));
+                            if (i == update.size() - 1) {
+                                userService.updateUser(user, update.get(i).getResidue());
+                            }
+                        }
                     }
                 }
-            }
 
-            //no loop karena transaksi yang dihapus ternyata index terakhir
-            if (update.isEmpty()) {
-                userService.updateUser(user, looping.get(looping.size() - 1).getResidue());
-            }
+                //no loop karena transaksi yang dihapus ternyata index terakhir
+                if (update.isEmpty()) {
+                    userService.updateUser(user, looping.get(looping.size() - 1).getResidue());
+                }
 
-            result = true;
+                result = true;
+            }
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
             result = false;
@@ -180,53 +194,54 @@ public class TransactionServiceImpl implements TransactionService {
                 } else transaction.setAmount(dto.getAmount());
 
                 transaction.setReceipt(dto.getReceipt());
+                if (transaction.getIsApproved().equalsIgnoreCase(Const.APPROVED)) {
 
-                User user = userService.getUserById(userId);
+                    User user = userService.getUserById(userId);
 
-                List<Transaction> update = repo.findAllByUserOrderByTransactionDateAsc(user);
-                List<Transaction> looping = new ArrayList<>();
-                Transaction indexMinus1 = null;
-                int flag = 0;
-                for (int i = 0; i < update.size(); i++) {
-                    if (update.get(i).getTransactionId() >= transaction.getTransactionId()) {
-                        if (i == 0) { //yg diupdate index pertama transaksi
-                            looping.add(transaction);
-                            flag = 1;
-                        } else if (flag == 0) {
-                            indexMinus1 = update.get(i - 1);
-                            looping.add(transaction);
-                            flag = 1;
-                        } else {
-                            looping.add(update.get(i));
+                    List<Transaction> update = repo.findAllByUserOrderByTransactionDateAsc(user);
+                    List<Transaction> looping = new ArrayList<>();
+                    Transaction indexMinus1 = null;
+                    int flag = 0;
+                    for (int i = 0; i < update.size(); i++) {
+                        if (update.get(i).getTransactionId() >= transaction.getTransactionId()) {
+                            if (i == 0) { //yg diupdate index pertama transaksi
+                                looping.add(transaction);
+                                flag = 1;
+                            } else if (flag == 0) {
+                                indexMinus1 = update.get(i - 1);
+                                looping.add(transaction);
+                                flag = 1;
+                            } else {
+                                looping.add(update.get(i));
+                            }
                         }
                     }
+
+                    if (indexMinus1 != null) { //update semua residue transaksi dimana index transaksi yg diupdate bukan yg pertama
+                        for (int i = 0; i < looping.size(); i++) {
+                            if (i == 0) {
+                                transaction.setResidue(indexMinus1.getResidue() + transaction.getAmount());
+                                repo.save(transaction);
+                            } else {
+                                looping.get(i).setResidue(looping.get(i - 1).getResidue() + looping.get(i).getAmount());
+                                repo.save(looping.get(i));
+                            }
+                        }
+                    } else { //update semua residue transaksi dimana index transaksi yg diupdate = yg pertama
+                        for (int i = 0; i < looping.size(); i++) {
+                            if (i == 0) {
+                                transaction.setResidue(user.getStartBalance() + transaction.getAmount());
+                                repo.save(transaction);
+                            } else {
+                                looping.get(i).setResidue(looping.get(i - 1).getResidue() + looping.get(i).getAmount());
+                                repo.save(looping.get(i));
+                            }
+                        }
+                    }
+
+                    userService.updateUser(user, looping.get(looping.size() - 1).getResidue());
                 }
-
-                if (indexMinus1 != null) { //update semua residue transaksi dimana index transaksi yg diupdate bukan yg pertama
-                    for (int i = 0; i < looping.size(); i++) {
-                        if (i == 0) {
-                            transaction.setResidue(indexMinus1.getResidue() + transaction.getAmount());
-                            repo.save(transaction);
-                        } else {
-                            looping.get(i).setResidue(looping.get(i - 1).getResidue() + looping.get(i).getAmount());
-                            repo.save(looping.get(i));
-                        }
-                    }
-                } else { //update semua residue transaksi dimana index transaksi yg diupdate = yg pertama
-                    for (int i = 0; i < looping.size(); i++) {
-                        if (i == 0) {
-                            transaction.setResidue(user.getStartBalance() + transaction.getAmount());
-                            repo.save(transaction);
-                        } else {
-                            looping.get(i).setResidue(looping.get(i - 1).getResidue() + looping.get(i).getAmount());
-                            repo.save(looping.get(i));
-                        }
-                    }
-                }
-
-                userService.updateUser(user, looping.get(looping.size() - 1).getResidue());
             }
-
             result = true;
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
@@ -252,13 +267,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction approveTransaction(long transactionId) {
+    public Transaction approveTransaction(long transactionId, long userId) throws NotFoundException {
+        User user = userService.getUserById(userId);
+        if(!user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN)){
+            throw new RequestNotAllowedException("role not eligible to approve transaction on userId = " + userId);
+        }
+
         Transaction transaction = repo.getOne(transactionId);
         if(transaction.getIsApproved().equalsIgnoreCase(Const.NOT_APPROVED)) {
+            transaction.setResidue(user.getAccountBalance() + transaction.getAmount());
+            userService.updateUserBalance(user.getUserId(), transaction.getAmount());
             transaction.setIsApproved(Const.APPROVED);
         }
         repo.save(transaction);
+
         return transaction;
+    }
+
+    @Override
+    public Page<Transaction> getTransactionByIsApproved(String isApproved, Pageable pageAble) {
+        return repo.findByIsApprovedOrderByTransactionDateAsc(isApproved, pageAble);
     }
 
 

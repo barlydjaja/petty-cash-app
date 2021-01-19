@@ -17,7 +17,7 @@ public class JWTGenerator {
         claims.put("username", loginDTO.getUsername());
         claims.put("password", loginDTO.getPassword());
         claims.put("userId", loginDTO.getUserId());
-        claims.put("roles", loginDTO.getRole());
+        claims.put("role", loginDTO.getRole());
 
         return Jwts.builder().setClaims(claims)
                 .signWith(SignatureAlgorithm.HS512,"PETTYCASH")

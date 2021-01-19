@@ -1,6 +1,5 @@
 package com.pettycash.config;
 
-import com.pettycash.en.Const;
 import com.pettycash.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,11 +7,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,6 +44,15 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
         return new ProviderManager(Collections.singletonList(authenticationProvider));
     }
 
+//    @Bean
+//    public DaoAuthenticationProvider authenticationProvider(){
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//        authProvider.setPasswordEncoder(passwordEncoder());
+//        authProvider.setUserDetailsService(userDetailsService());
+//
+//        return authProvider;
+//    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -50,9 +61,9 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/v1/**").permitAll()
+                .authorizeRequests().antMatchers("/secured/**").permitAll()
                 .and()
-                .authorizeRequests().antMatchers("/**/admin/**").hasRole("admin")
+                .authorizeRequests().anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
@@ -63,6 +74,11 @@ public class JWTConfig extends WebSecurityConfigurerAdapter {
 
         http.headers().cacheControl();
     }
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder){
+//        authenticationManagerBuilder.authenticationProvider(authenticationProvider());
+//    }
 
     @Bean
     public JWTAuthenticationTokenFilter authenticationTokenFilter() {

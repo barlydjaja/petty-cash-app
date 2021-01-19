@@ -3,19 +3,17 @@ package com.pettycash.config;
 import com.pettycash.dto.JWTAuthenticationToken;
 import com.pettycash.dto.JwtUserDetails;
 import com.pettycash.dto.LoginDTO;
-import com.pettycash.entity.Role;
 import com.pettycash.entity.User;
-import com.pettycash.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Component
 public class JWTAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
@@ -39,11 +37,14 @@ public class JWTAuthenticationProvider extends AbstractUserDetailsAuthentication
         if (userDomain == null) {
             throw new RuntimeException("SALAH TOKEN");
         }
+
         //in case role
         User user = new User();
+        user.setUsername(userDomain.getUsername());
         user.setPassword(userDomain.getPassword());
         user.setUserId(userDomain.getUserId());
-        user.setRoles(userDomain.getRole());
+        user.setRole(userDomain.getRole());
+
         return new JwtUserDetails(user);
     }
 

@@ -57,10 +57,8 @@ public class LoginController {
     public ResponseEntity<User> assign(@RequestBody Map<String, Long> request) throws NotFoundException {
         User user = userService.getUserById(request.get("userId"));
         Role role = roleService.getById(request.get("roleId"));
-        Set<Role> roleSet = new HashSet<>();
-        roleSet.add(role);
 
-        user.setRoles(roleSet);
+        user.setRole(role);
         userRepository.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

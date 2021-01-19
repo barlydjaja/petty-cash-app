@@ -4,8 +4,8 @@
 
     <div
       class="transactions"
-      v-for="userTransaction in userTransactions"
-      v-bind:key="userTransaction.transactionId"
+      v-for="(userTransaction, index) in userTransactions"
+      v-bind:key="index"
     >
       <b-row>
         <b-col sm="2">
@@ -21,6 +21,7 @@
           v-bind:class="
             userTransaction.receipt === 'income' ? 'income' : 'expenses'
           "
+          sm="2"
         >
           {{
             userTransaction.receipt === "income"
@@ -29,39 +30,45 @@
           }}
         </b-col>
         <b-col sm="2"> Rp. {{ userTransaction.residue }} </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
+        <b-col sm="2">
           <b-button
             v-b-modal="'my-modal'"
             @click="(e) => handleEdit(e, userTransaction.transactionId)"
-            >Edit</b-button
+            class="btn btn-sm"
           >
-        </b-col>
-        <b-col>
+            <ClipboardEdit />
+          </b-button>
+
           <b-button
             v-if="!userTransaction.fileName"
             v-b-modal="'upload'"
+            class="btn btn-sm mx-1"
             @click="(e) => handleUpload(e, userTransaction.transactionId)"
           >
-            upload
+            <CloudUpload />
           </b-button>
-          <b-button
+
+          <a
+            v-auth-href="{ token: token }"
+            v-bind:href="
+              'http://10.69.72.89:8081/pettycash/v1/file/download/' +
+                userTransaction.transactionId
+            "
             v-if="userTransaction.fileName"
-            @click="(e) => handleDownload(e, userTransaction.transactionId)"
+            class="btn btn-sm btn-secondary mx-1"
           >
-            download
-            <div id="image"></div>
-          </b-button>
-        </b-col>
-        <b-col class="text-center ">
+            <Download />
+          </a>
+
           <span
             class="btn btn-sm btn-danger "
             @click="(e) => handleDelete(e, userTransaction.transactionId)"
-            >X</span
-          >
+            ><Delete
+          /></span>
         </b-col>
       </b-row>
+      <!-- <b-row> -->
+      <!-- </b-row> -->
 
       <hr />
     </div>
@@ -127,9 +134,9 @@
           <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
         </b-form>
-        <b-card class="mt-3" header="Form Data Result">
+        <!-- <b-card class="mt-3" header="Form Data Result">
           <pre class="m-0">{{ form }}</pre>
-        </b-card>
+        </b-card> -->
       </div>
     </b-modal>
     <b-modal id="upload" title="Upload Bukti Transaksi">
@@ -149,7 +156,14 @@
 
 <script>
 import axios from "axios";
+import ClipboardEdit from "vue-material-design-icons/ClipboardEdit.vue";
+import CloudUpload from "vue-material-design-icons/CloudUpload.vue";
+import Download from "vue-material-design-icons/Download.vue";
+import Delete from "vue-material-design-icons/Delete.vue";
+
 // import EditTransaction from "../components/EditTransaction";
+let authHeader = `Bearer + ${localStorage.getItem("token")}`;
+axios.defaults.headers.common["Authorization"] = authHeader;
 export default {
   name: "transaction",
   props: ["userTransactions"],
@@ -184,10 +198,14 @@ export default {
       ],
       show: true,
       file: "",
+      token: localStorage.getItem("token"),
     };
   },
   components: {
-    // EditTransaction,
+    ClipboardEdit,
+    CloudUpload,
+    Download,
+    Delete,
   },
   methods: {
     handleDelete: function(e, id) {
@@ -199,9 +217,9 @@ export default {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
-      // const urlGet =
-      //   "http://10.69.72.89:8081/pettycash/view/getTransaction?userId=1&page=0";
-      axios.get(urlDel, config).then((res) => console.log(res));
+      axios.get(urlDel, config).then((res) => {
+        if (res.status === 200) this.$router.go();
+      });
     },
 
     handleEdit(e, id) {
@@ -212,27 +230,6 @@ export default {
     handleUpload(e, id) {
       e.preventDefault();
       this.transactionId = id;
-    },
-
-    handleDownload(e, id) {
-      e.preventDefault();
-      this.transactionId = id;
-      const url = `http://10.69.72.89:8081/pettycash/v1/file/download/${this.transactionId}`;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          responseType: "blob",
-        },
-      };
-      axios.get(url, config).then((res) => {
-        const fileUrl = window.URL.createObjectURL(new Blob([res.data]));
-        const fileLink = document.createElement("a");
-        fileLink.href = fileUrl;
-
-        fileLink.setAttribute("download", "image.jpg");
-        document.body.appendChild(fileLink);
-        fileLink.click();
-      });
     },
 
     onSubmit(event) {
@@ -269,7 +266,10 @@ export default {
 
       axios
         .post(url, formData, config)
-        .then((res) => console.log(res.data))
+        .then((res) => {
+          console.log(res.data);
+          if (res.status === 200) this.$router.go();
+        })
         .catch((err) => console.log(err));
     },
 

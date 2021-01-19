@@ -14,9 +14,13 @@
     "core-js": "^3.6.5",
     "jquery": "^3.5.1",
     "vue": "^2.6.11",
+    "vue-auth-href": "^1.1.1",
+    "vue-auth-image": "0.0.3",
     "vue-i18n": "^8.22.3",
+    "vue-material-design-icons": "^4.11.0",
     "vue-pagination-2": "^3.0.8",
-    "vue-router": "^3.4.9"
+    "vue-router": "^3.4.9",
+    "vuejs-paginate": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

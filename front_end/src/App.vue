@@ -4,6 +4,8 @@
     <router-link to="/about" />
     <router-link to="/demo" />
     <router-link to="/login" />
+    <router-link to="/transaction" />
+    <router-link to="/approval"></router-link>
     <router-view />
     <h1></h1>
   </div>

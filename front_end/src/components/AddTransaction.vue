@@ -127,12 +127,16 @@ export default {
       console.log(this.form);
       axios
         .post(url, this.form, config)
-        .then((res) => console.log(res.data))
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            this.$router.go();
+          }
+        })
+        .then(this.$bvModal.hide("modal-prevent-closing-2"))
         .catch((err) => console.log(err));
       // alert(JSON.stringify(this.form));
       // console.log(this.form);
-      this.$bvModal.hide("modal-prevent-closing-2");
-      this.$forceUpdate();
     },
     onReset(event) {
       event.preventDefault();

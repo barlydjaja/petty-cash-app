@@ -9,7 +9,6 @@ import com.pettycash.service.LoginService;
 import com.pettycash.service.UserService;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,14 +37,14 @@ public class LoginServiceImpl implements LoginService {
         else{
             loginDTO.setUserId(userTable.getUserId());
             loginDTO.setUsername(userTable.getUsername());
-            loginDTO.setRole(userTable.getRoles());
+            loginDTO.setRole(userTable.getRole());
             JWTAuthenticationToken jwtAuthenticationToken = new JWTAuthenticationToken(jwtGenerator.generate(loginDTO));
 
             String payload = jwtAuthenticationToken.getToken();
             TokenDTO loginDomain = new TokenDTO();
             loginDomain.setToken(payload);
             loginDomain.setUserId(userTable.getUserId());
-            loginDomain.setRole(userTable.getRoles());
+            loginDomain.setRole(userTable.getRole());
             return loginDomain;
         }
     }

@@ -42,16 +42,11 @@ public class UserServiceImpl implements UserService {
             newUser.setDepartment(details.getDepartment());
             newUser.setUsername(details.getName());
             newUser.setAccountBalance(details.getBalance());
-
-            Role role = roleService.getByName(Const.STAFF);
-            Set<Role> roleSet = new HashSet<>();
-            roleSet.add(role);
-
-            if(details.getName().equalsIgnoreCase(Const.ADMIN)){
-                roleSet.add(roleService.getByName(Const.ADMIN));
-            }
-
-            newUser.setRoles(roleSet);
+            Role role;
+            if(details.getRole().equalsIgnoreCase(Const.STAFF)) {
+            role = roleService.getByName(Const.STAFF);
+            } else role = roleService.getByName(Const.ADMIN);
+            newUser.setRole(role);
 
             repo.save(newUser);
         } else throw new Exception("user with the same username exists");

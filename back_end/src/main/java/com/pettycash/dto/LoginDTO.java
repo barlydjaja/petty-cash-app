@@ -11,6 +11,6 @@ import java.util.Set;
 public class LoginDTO {
     private String username;
     private String password;
-    private Set<Role> role;
+    private Role role;
     private long userId;
 }

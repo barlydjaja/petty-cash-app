@@ -32,5 +32,7 @@ public interface TransactionService {
 
     List<Transaction> getAllByUserAndIsApproved(User user, String isApproved);
 
-    Transaction approveTransaction(long transactionId);
+    Transaction approveTransaction(long transactionId, long userId) throws NotFoundException;
+
+    Page<Transaction> getTransactionByIsApproved(String isApproved, Pageable pageable);
 }

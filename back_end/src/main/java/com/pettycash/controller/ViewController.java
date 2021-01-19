@@ -4,17 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.pettycash.en.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.pettycash.dto.LandingPageDTO;
 import com.pettycash.entity.Transaction;
@@ -25,6 +22,8 @@ import com.pettycash.service.TransactionTypeService;
 import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
+
+import javax.xml.ws.Response;
 
 @CrossOrigin
 @RestController
@@ -40,16 +39,6 @@ public class ViewController {
         this.transactionService = transactionService;
         this.transactionTypeService = transactionTypeService;
         this.userService = userService;
-    }
-
-    @GetMapping("/getAllByUserId")
-    @CrossOrigin
-    public ResponseEntity<LandingPageDTO> getTransactionByUserId(@RequestParam("userId") long userId) throws NotFoundException {
-        User user = userService.getUserById(userId);
-        List<Transaction> transaction = transactionService.getAllByUser(user);
-        LandingPageDTO view = transactionService.getView(user, transaction);
-
-        return new ResponseEntity<>(view, HttpStatus.OK);
     }
 
     @GetMapping("/getTransactionType")
@@ -85,4 +74,53 @@ public class ViewController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/approved-transaction")
+    @CrossOrigin
+    public ResponseEntity<Map<String, Object>> getApprovedTransactionWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
+        List<Transaction> transactions;
+        Pageable paging = PageRequest.of(page, 10);
+
+        User user = userService.getUserById(userId);
+        Page<Transaction> pageTrans = transactionService.getTransactionByIsApproved(Const.APPROVED, paging);
+        transactions = pageTrans.getContent();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", user.getUsername());
+        response.put("code", user.getCode());
+        response.put("department", user.getDepartment());
+        response.put("transactions", transactions);
+        response.put("currentPage", pageTrans.getNumber());
+        response.put("totalItems", pageTrans.getTotalElements());
+        response.put("totalPages", pageTrans.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/not-approved-transaction")
+    @CrossOrigin
+    public ResponseEntity<Map<String, Object>> getNotApprovedTransactionWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
+        List<Transaction> transactions;
+        Pageable paging = PageRequest.of(page, 10);
+
+        User user = userService.getUserById(userId);
+        Page<Transaction> pageTrans = transactionService.getTransactionByIsApproved(Const.NOT_APPROVED, paging);
+        transactions = pageTrans.getContent();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", user.getUsername());
+        response.put("code", user.getCode());
+        response.put("department", user.getDepartment());
+        response.put("transactions", transactions);
+        response.put("currentPage", pageTrans.getNumber());
+        response.put("totalItems", pageTrans.getTotalElements());
+        response.put("totalPages", pageTrans.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/anjink")
+    public ResponseEntity<User> anjing(@RequestBody Map<String, String> request){
+        User user = userService.getUserByUsername(request.get("username"));
+        return new ResponseEntity<>(userService.changePassword(user.getUserId(), request.get("password")), HttpStatus.OK);
+    }
 }

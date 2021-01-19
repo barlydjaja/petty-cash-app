@@ -31,7 +31,7 @@ import javassist.NotFoundException;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/v1/add")
+@RequestMapping("/v1/transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -45,7 +45,7 @@ public class TransactionController {
         this.userService = userService;
     }
 
-    @PostMapping("/addTransaction")
+    @PostMapping("/add")
     @CrossOrigin
     public ResponseEntity<Transaction> addTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException {
 
@@ -64,7 +64,7 @@ public class TransactionController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping("/transactionType")
+    @PostMapping("/type")
     @CrossOrigin
     public ResponseEntity<TransactionType> addNewTransactionType(@RequestBody TransactionTypeDTO name) {
         TransactionType type = transactionTypeService.addType(name.getName());
@@ -72,7 +72,7 @@ public class TransactionController {
         return new ResponseEntity<>(type, HttpStatus.OK);
     }
 
-    @GetMapping("/delete-transaction")
+    @GetMapping("/delete")
     @CrossOrigin
     public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long transactionId, HttpServletRequest request) {
         HttpStatus status;
@@ -88,7 +88,7 @@ public class TransactionController {
         return new ResponseEntity<>(response, status);
     }
 
-    @PostMapping("/update-transaction")
+    @PostMapping("/update")
     @CrossOrigin
     public ResponseEntity<GeneralResponse> updateTransaction(@RequestParam long transactionId, @RequestBody TransactionDTO transactionDTO, HttpServletRequest request) throws NotFoundException {
         HttpStatus status;
@@ -104,10 +104,10 @@ public class TransactionController {
         return new ResponseEntity<>(response, status);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_admin')")
-    @GetMapping("/admin/approveTransaction")
-    public ResponseEntity<Transaction> approveTransaction(@RequestParam long userId, @RequestParam long transactionId){
-        Transaction transaction = transactionService.approveTransaction(transactionId);
+
+    @GetMapping("/approve")
+    public ResponseEntity<Transaction> approveTransaction(@RequestParam long userId, @RequestParam long transactionId) throws NotFoundException {
+        Transaction transaction = transactionService.approveTransaction(transactionId, userId);
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 

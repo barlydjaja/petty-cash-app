@@ -3,16 +3,16 @@
     <b-container class="px-0">
       <b-row align-h="center" class="text-center pb-3">
         <b-col sm="7" md="4" class="px-0 ">
-          <span class="text-title-config ">Tentang Kami</span>
+          <span class="text-title-config ">{{ $t("about") }}</span>
           <hr />
-          <span class="text-subtitle-config ">Profil Perusahaan</span>
+          <span class="text-subtitle-config ">{{ $t("companyProfile") }}</span>
           <br />
-          <span class="text-subtitle-config ">Sejarah Perusahaan</span>
+          <span class="text-subtitle-config ">{{ $t("companyHistory") }}</span>
           <br />
-          <span class="text-subtitle-config ">Karir</span>
+          <span class="text-subtitle-config ">{{ $t("career") }}</span>
         </b-col>
         <b-col sm="7" md="4">
-          <span class="text-title-config">Sosial Media</span>
+          <span class="text-title-config">{{ $t("sosmed") }}</span>
           <hr />
           <span class="text-subtitle-config ">Facebook</span>
           <br />
@@ -25,11 +25,11 @@
         <b-col sm="7" md="4">
           <span class="text-title-config ">QnA</span>
           <hr />
-          <span class="text-subtitle-config">Cara Kerja</span>
+          <span class="text-subtitle-config">{{ $t("howItWorks") }}</span>
           <br />
-          <span class="text-subtitle-config">Kendala Perhitungan</span>
+          <span class="text-subtitle-config">{{ $t("misscalculation") }} </span>
           <br />
-          <span class="text-subtitle-config">Lainnya</span>
+          <span class="text-subtitle-config">{{ $t("others") }}</span>
           <br />
         </b-col>
       </b-row>

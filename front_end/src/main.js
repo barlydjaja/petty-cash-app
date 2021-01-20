@@ -8,12 +8,15 @@ import VueAuthHref from "vue-auth-href";
 import Pagination from "vue-pagination-2";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+import "element-ui/lib/theme-chalk/index.css";
+import ElementUI from "element-ui";
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(VueAuthImage);
 Vue.use(VueAuthHref);
+Vue.use(ElementUI);
 
 Vue.component("pagination", Pagination);
 

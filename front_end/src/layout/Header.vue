@@ -27,7 +27,7 @@
 
             <!-- Right aligned nav items -->
             <b-navbar-nav class="ml-auto text-coloring">
-              <div class="mx-3 text-config">Tentang</div>
+              <div class="mx-3 text-config">{{ $t("about") }}</div>
               <router-link to="/demo">
                 <div
                   class="mx-3 text-config"
@@ -52,6 +52,15 @@
                       @hidden="resetModal"
                       @ok="handleOk"
                     >
+                      <div class="text-danger text-center" v-if="!userFound">
+                        account not found
+                      </div>
+                      <div
+                        class="text-danger text-center"
+                        v-if="!serverNotError"
+                      >
+                        Server Error
+                      </div>
                       <form ref="form" @submit.stop.prevent="handleSubmit">
                         <b-form-group
                           label="Username"
@@ -72,19 +81,24 @@
                           label="password"
                           label-for="password-input"
                           invalid-feedback="password is required"
-                          :state="nameState"
                         >
-                          <b-form-input
+                          <VuePassword
+                            id="password-input"
+                            disableStrength
+                            v-model="form.password"
+                          />
+                          <!-- <b-form-input
+                            :type="passwordFieldType"
                             id="password-input"
                             v-model="form.password"
-                            :state="nameState"
                             required
-                          ></b-form-input>
+                          >
+                          </b-form-input> -->
                         </b-form-group>
                       </form>
                       <!-- <b-card class="mt-3" header="Form Data Result">
-          <pre class="m-0">{{ form }}</pre>
-        </b-card> -->
+                        <pre class="m-0">{{ form }}</pre>
+                      </b-card> -->
                     </b-modal>
                   </div>
                 </div>
@@ -120,6 +134,7 @@
 <script>
 import axios from "axios";
 import { i18n } from "../i18n";
+import VuePassword from "vue-password";
 
 export default {
   name: "Header",
@@ -133,7 +148,12 @@ export default {
         { language: "en", title: "English" },
         { language: "id", title: "Indonesia" },
       ],
+      userFound: true,
+      serverNotError: true,
     };
+  },
+  components: {
+    VuePassword,
   },
 
   methods: {
@@ -163,10 +183,9 @@ export default {
         .post(url, this.form)
         .then((res) => {
           console.log(res.data);
-          localStorage.setItem("role", res.data.role);
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("userId", res.data.userId);
-          localStorage.setItem("username", this.form.username);
+          localStorage.setItem("username", res.data.role.roleName);
           this.username = this.form.username;
           // console.log(this.username);
           // console.log(this.$router.currentRoute.path);
@@ -176,11 +195,18 @@ export default {
             if (res.status === 200) this.$router.go();
           }
         })
-        .catch((err) => console.err("error", err));
+        .catch((err) => {
+          if (Number(err.response.status === 500)) {
+            this.userFound = false;
+            setTimeout(() => {
+              this.userFound = true;
+            }, 2000);
+          }
+        });
       // Hide the modal manually
-      this.$nextTick(() => {
-        this.$bvModal.hide("modal-prevent-closing");
-      });
+      // this.$nextTick(() => {
+      //   this.$bvModal.hide("modal-prevent-closing");
+      // });
     },
 
     isLogin() {

@@ -61,18 +61,18 @@
           </a>
 
           <span
-            class="btn btn-sm btn-danger "
-            @click="(e) => handleDelete(e, userTransaction.transactionId)"
-            ><Delete
-          /></span>
+            v-b-modal="'delete'"
+            class="btn btn-sm btn-danger"
+            @click="(e) => onDelete(e, userTransaction.transactionId)"
+          >
+            <Delete />
+          </span>
         </b-col>
       </b-row>
-      <!-- <b-row> -->
-      <!-- </b-row> -->
 
       <hr />
     </div>
-    <b-modal id="my-modal" title="Edit Transaksi" @ok="onSubmit">
+    <b-modal id="my-modal" title="Edit Transaksi" hide-footer>
       <div>
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">
           <b-form-group
@@ -139,7 +139,12 @@
         </b-card> -->
       </div>
     </b-modal>
-    <b-modal id="upload" title="Upload Bukti Transaksi">
+    <b-modal
+      id="upload"
+      title="Upload Bukti Transaksi"
+      @ok="submitFile()"
+      centered
+    >
       <label
         >File
         <input
@@ -149,7 +154,19 @@
           v-on:change="handleFileUpload()"
         />
       </label>
-      <button v-on:click="submitFile()">Submit</button>
+      <!-- <button v-on:click="submitFile()">Submit</button> -->
+    </b-modal>
+    <b-modal
+      id="delete"
+      @ok="handleDelete()"
+      hide-header
+      centered
+      ok-variant="danger"
+    >
+      <h4 class="lead text-center">
+        Delete Transaction?
+      </h4>
+      <!-- <button v-on:click="submitFile()">Submit</button> -->
     </b-modal>
   </div>
 </template>
@@ -175,7 +192,7 @@ export default {
       transactionType: "",
       amount: 0,
       form: {
-        userId: 1,
+        userId: localStorage.getItem("userId"),
       },
       transactions: [
         { text: "Select One", value: null },
@@ -208,10 +225,13 @@ export default {
     Delete,
   },
   methods: {
-    handleDelete: function(e, id) {
+    onDelete(e, id) {
       e.preventDefault();
-      // console.log(id);
-      const urlDel = `http://10.69.72.89:8081/pettycash/v1/add/delete-transaction?transactionId=${id}`;
+      this.transactionId = id;
+    },
+
+    handleDelete: function() {
+      const urlDel = `http://10.69.72.89:8081/pettycash/v1/transaction/delete?transactionId=${this.transactionId} `;
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -234,14 +254,16 @@ export default {
 
     onSubmit(event) {
       event.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/add/update-transaction?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update?transactionId=${this.transactionId}`;
       // console.log(this.form);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       };
       axios
         .post(url, this.form, config)
-        .then((res) => console.log(res.data))
+        .then((res) => {
+          if (res.status === 200) this.$router.go();
+        })
         .catch((err) => console.log(err));
       // alert(JSON.stringify(this.form));
       // console.log(this.form);
@@ -279,6 +301,7 @@ export default {
       this.form.description = "";
       this.form.receipt = "";
       this.form.transactionTypeId = 0;
+      this.form.amount = 0;
       // Trick to reset/clear native browser form validation state
       this.show = false;
       this.$nextTick(() => {

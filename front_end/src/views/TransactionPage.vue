@@ -6,7 +6,7 @@
         <b-row class="align-items-center">
           <b-col sm="9">
             <div class="username font-weight-bold">
-              Username: {{ userData.name }}
+              Username: {{ username }}
             </div>
             <br />
             <div class="balance">
@@ -19,13 +19,13 @@
           </b-col>
         </b-row>
 
-        <div class="new-transaction mt-2">Transaksi Baru</div>
+        <div class="new-transaction mt-2">{{ $t("newTransaction") }}</div>
         <b-row class="mt-3 font-weight-bold">
-          <b-col class="number" sm="2"> Tanggal </b-col>
-          <b-col class="transaction" sm="2">Transaksi</b-col>
-          <b-col class="date" sm="2">Deskripsi</b-col>
-          <b-col class="income-expenses" sm="2">mutasi</b-col>
-          <b-col class="ending-balance" sm="2">Sisa Saldo</b-col>
+          <b-col class="number" sm="2"> {{ $t("date") }} </b-col>
+          <b-col class="transaction" sm="2">{{ $t("transaction2") }}</b-col>
+          <b-col class="date" sm="2">{{ $t("description") }}</b-col>
+          <b-col class="income-expenses" sm="2">{{ $t("mutation") }}</b-col>
+          <b-col class="ending-balance" sm="2">{{ $t("endBalance") }}</b-col>
           <b-col></b-col>
         </b-row>
 
@@ -68,14 +68,16 @@ export default {
       accountBalance: 0,
       pages: 1,
       totalPages: 1,
+      username: localStorage.getItem("username"),
     };
   },
 
   methods: {
     handlePageChange(pageNumber) {
       console.log(pageNumber);
-      let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=1&page=${pageNumber -
-        1}`;
+      let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
+        "userId"
+      )}&page=${pageNumber - 1}`;
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -106,7 +108,7 @@ export default {
       let page = this.pages;
       if (this.pages === 0) this.page = 0;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=1&page=${page -
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=2&page=${page -
         1}`;
 
       const config = {
@@ -119,7 +121,8 @@ export default {
         .then((res) => {
           this.userData = res.data;
           this.userTransactions = res.data.transactions;
-          this.accountBalance = res.data.transactions[0].user.accountBalance;
+          if (res.data.transactions[0])
+            this.accountBalance = res.data.transactions[0].user.accountBalance;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
           console.log(res.data);

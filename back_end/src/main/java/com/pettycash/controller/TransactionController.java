@@ -1,13 +1,17 @@
 package com.pettycash.controller;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.pettycash.en.Const;
+import com.pettycash.entity.*;
+import com.pettycash.exception.RequestNotAllowedException;
+import com.pettycash.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +24,6 @@ import com.pettycash.dto.GeneralResponse;
 import com.pettycash.dto.TransactionDTO;
 import com.pettycash.dto.TransactionTypeDTO;
 import com.pettycash.dto.UserDTO;
-import com.pettycash.entity.Transaction;
-import com.pettycash.entity.TransactionType;
-import com.pettycash.entity.User;
-import com.pettycash.service.TransactionService;
-import com.pettycash.service.TransactionTypeService;
-import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
 
@@ -37,23 +35,33 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final TransactionTypeService transactionTypeService;
     private final UserService userService;
+    private final NotApprovedTransactionService notApprovedTransactionService;
+    private final PendingTransactionService pendingTransactionService;
 
     @Autowired
-    public TransactionController(TransactionService transactionService, TransactionTypeService transactionTypeService, UserService userService) {
+    public TransactionController(PendingTransactionService pendingTransactionService, NotApprovedTransactionService notApprovedTransactionService, TransactionService transactionService, TransactionTypeService transactionTypeService, UserService userService) {
         this.transactionService = transactionService;
         this.transactionTypeService = transactionTypeService;
         this.userService = userService;
+        this.notApprovedTransactionService = notApprovedTransactionService;
+        this.pendingTransactionService = pendingTransactionService;
     }
 
     @PostMapping("/add")
     @CrossOrigin
-    public ResponseEntity<Transaction> addTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException {
-
+    public ResponseEntity<?> addTransaction(@RequestBody TransactionDTO transactionDTO) throws NotFoundException {
+        Transaction transaction;
+        NotApprovedTransaction notApprovedTransaction;
         User user = userService.getUserById(transactionDTO.getUserId());
         TransactionType transactionType = transactionTypeService.getTypeById(transactionDTO.getTransactionTypeId());
-        Transaction transaction = transactionService.addTransaction(transactionDTO, user, transactionType);
+        if(user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN)) {
+            transaction = transactionService.addTransaction(transactionDTO, user, transactionType);
+            return new ResponseEntity<>(transaction, HttpStatus.OK);
+        } else {
+            notApprovedTransaction = notApprovedTransactionService.addNotApprovedTransaction(transactionDTO);
+            return new ResponseEntity<>(notApprovedTransaction, HttpStatus.OK);
+        }
 
-        return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
     @PostMapping("/user")
@@ -74,10 +82,19 @@ public class TransactionController {
 
     @GetMapping("/delete")
     @CrossOrigin
-    public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long transactionId, HttpServletRequest request) {
+    public ResponseEntity<GeneralResponse> deleteTransaction(@RequestParam long userId, @RequestParam long transactionId, HttpServletRequest request) throws NotFoundException {
         HttpStatus status;
+        boolean result = true;
         GeneralResponse response = new GeneralResponse();
-        boolean result = transactionService.deleteTransaction(transactionId);
+        User user = userService.getUserById(userId);
+        Transaction transaction = transactionService.getById(transactionId);
+        if(user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN)) {
+            result = transactionService.deleteTransaction(transactionId);
+        } else {
+            if(transaction.getPendingDelete().equalsIgnoreCase(Const.NO)){
+                transactionService.setPendingDeleteUpdate(transactionId, Const.DELETE);
+            }
+        }
 
         if(result){
             status = HttpStatus.OK;
@@ -86,14 +103,55 @@ public class TransactionController {
         setResponse(response, result, request);
 
         return new ResponseEntity<>(response, status);
+    }
+
+    @GetMapping("/approve-update")
+    @CrossOrigin
+    public ResponseEntity<GeneralResponse>  approveUpdateTransaction(@RequestParam long userId, @RequestParam long transactionId, HttpServletRequest request) throws NotFoundException {
+        HttpStatus status;
+        GeneralResponse response = new GeneralResponse();
+        boolean result = false;
+        Transaction transaction = transactionService.getById(transactionId);
+        PendingTransaction pendingTransaction = pendingTransactionService.getByTransactionId(transactionId);
+        User user = userService.getUserById(userId);
+        if(user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN) && transaction.getPendingUpdate().equalsIgnoreCase(Const.YES)) {
+            if (pendingTransaction != null) {
+                result = transactionService.updateTransaction(transactionId, pendingTransaction, userId);
+            } else throw new NotFoundException("pending transaction for transaction id : " + transactionId + " is not found");
+        }
+
+        if(result){
+            status = HttpStatus.OK;
+        } else status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        setResponse(response, result, request);
+        return new ResponseEntity<>(response, status);
+
     }
 
     @PostMapping("/update")
     @CrossOrigin
     public ResponseEntity<GeneralResponse> updateTransaction(@RequestParam long transactionId, @RequestBody TransactionDTO transactionDTO, HttpServletRequest request) throws NotFoundException {
         HttpStatus status;
+        boolean result = true;
         GeneralResponse response = new GeneralResponse();
-        boolean result = transactionService.updateTransaction(transactionId, transactionDTO, transactionDTO.getUserId());
+        Transaction transaction = transactionService.getById(transactionId);
+        PendingTransaction pendingTransaction = pendingTransactionService.getByTransactionId(transactionId);
+
+        User user = userService.getUserById(transactionDTO.getUserId());
+              if (pendingTransaction != null) {
+                throw new RequestNotAllowedException("update for transaction id : " + transactionId + " is not allowed, please check update request");
+              }
+            if(user.getRole().getRoleName().equalsIgnoreCase(Const.ADMIN)) {
+                if (transaction.getPendingUpdate().equalsIgnoreCase(Const.NO)) {
+                    result = transactionService.updateTransaction(transactionId, transactionDTO, user.getUserId());
+                }
+            }
+            else if(transaction.getPendingUpdate().equalsIgnoreCase(Const.NO)) {
+                    pendingTransactionService.savePendingTransaction(transactionId, transactionDTO);
+                    transactionService.setPendingDeleteUpdate(transactionId, Const.UPDATE);
+                }
+
 
         if(result){
             status = HttpStatus.OK;
@@ -104,10 +162,54 @@ public class TransactionController {
         return new ResponseEntity<>(response, status);
     }
 
-
     @GetMapping("/approve")
+    @CrossOrigin
     public ResponseEntity<Transaction> approveTransaction(@RequestParam long userId, @RequestParam long transactionId) throws NotFoundException {
-        Transaction transaction = transactionService.approveTransaction(transactionId, userId);
+        User user = userService.getUserById(userId);
+        NotApprovedTransaction notApprovedTransaction = notApprovedTransactionService.findById(transactionId);
+        Transaction transaction = notApprovedTransactionService.approveTransaction(user, notApprovedTransaction);
+        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    }
+
+    @PostMapping("/edit-pending")
+    @CrossOrigin
+    public ResponseEntity<PendingTransaction> editPendingTransaction(@RequestBody Map<String, Object> request) throws NotFoundException {
+        /*
+            {
+                "pendingTransactionId" : long,
+                "transactionTypeId" : long,
+                "amount" : long,
+                "description" : String,
+                "receipt" : String,
+            }
+         */
+        PendingTransaction pendingTransaction = pendingTransactionService.updatePendingTransaction(request);
+
+        return new ResponseEntity<>(pendingTransaction, HttpStatus.OK);
+    }
+
+    @GetMapping("/reject-delete")
+    @CrossOrigin
+    public ResponseEntity<Transaction> rejectDelete(@RequestParam long transactionId) throws NotFoundException {
+        Transaction transaction = transactionService.getById(transactionId);
+        if(transaction == null){
+            throw new NotFoundException("transaction not found for id : " + transactionId);
+        }
+        if(transaction.getPendingDelete().equalsIgnoreCase(Const.YES)) {
+            transactionService.setPendingDeleteUpdate(transactionId, Const.DELETE);
+        }
+        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    }
+
+    @GetMapping("/reject-update")
+    @CrossOrigin
+    public ResponseEntity<Transaction> rejectUpdate(@RequestParam long transactionId){
+        PendingTransaction pendingTransaction = pendingTransactionService.getByTransactionId(transactionId);
+        Transaction transaction = transactionService.getById(pendingTransaction.getTransactionId());
+        if(transaction.getPendingUpdate().equalsIgnoreCase(Const.YES)){
+            pendingTransactionService.deletePendingTransaction(pendingTransaction.getTransactionId());
+            transactionService.setPendingDeleteUpdate(transactionId, Const.UPDATE);
+        }
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 

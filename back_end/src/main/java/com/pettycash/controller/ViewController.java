@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.pettycash.en.Const;
+import com.pettycash.entity.*;
+import com.pettycash.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,17 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.pettycash.dto.LandingPageDTO;
-import com.pettycash.entity.Transaction;
-import com.pettycash.entity.TransactionType;
-import com.pettycash.entity.User;
-import com.pettycash.service.TransactionService;
-import com.pettycash.service.TransactionTypeService;
-import com.pettycash.service.UserService;
-
 import javassist.NotFoundException;
-
-import javax.xml.ws.Response;
 
 @CrossOrigin
 @RestController
@@ -33,12 +25,16 @@ public class ViewController {
     private final TransactionService transactionService;
     private final TransactionTypeService transactionTypeService;
     private final UserService userService;
+    private final NotApprovedTransactionService notApprovedTransactionService;
+    private final PendingTransactionService pendingTransactionService;
 
     @Autowired
-    public ViewController(TransactionService transactionService, TransactionTypeService transactionTypeService, UserService userService) {
+    public ViewController(PendingTransactionService pendingTransactionService, NotApprovedTransactionService notApprovedTransactionService, TransactionService transactionService, TransactionTypeService transactionTypeService, UserService userService) {
         this.transactionService = transactionService;
         this.transactionTypeService = transactionTypeService;
         this.userService = userService;
+        this.notApprovedTransactionService = notApprovedTransactionService;
+        this.pendingTransactionService = pendingTransactionService;
     }
 
     @GetMapping("/getTransactionType")
@@ -49,31 +45,6 @@ public class ViewController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/getTransaction")
-    @CrossOrigin
-    public ResponseEntity<Map<String, Object>> getTransactionByUserIdWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
-
-        System.out.println("get trans");
-        List<Transaction> transactions;
-        User user = userService.getUserById(userId);
-        Pageable paging = PageRequest.of(page, 10);
-
-        Page<Transaction> pageTrans = transactionService.getAllWithPaging(user, paging);
-
-        transactions = pageTrans.getContent();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("name", user.getUsername());
-        response.put("code", user.getCode());
-        response.put("department", user.getDepartment());
-        response.put("transactions", transactions);
-        response.put("currentPage", pageTrans.getNumber());
-        response.put("totalItems", pageTrans.getTotalElements());
-        response.put("totalPages", pageTrans.getTotalPages());
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @GetMapping("/approved-transaction")
     @CrossOrigin
     public ResponseEntity<Map<String, Object>> getApprovedTransactionWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
@@ -81,7 +52,8 @@ public class ViewController {
         Pageable paging = PageRequest.of(page, 10);
 
         User user = userService.getUserById(userId);
-        Page<Transaction> pageTrans = transactionService.getTransactionByIsApproved(Const.APPROVED, paging);
+        User admin = userService.getUserById(Const.ADMIN_ID);
+        Page<Transaction> pageTrans = transactionService.getAllWithPaging(paging);
         transactions = pageTrans.getContent();
 
         Map<String, Object> response = new HashMap<>();
@@ -92,6 +64,7 @@ public class ViewController {
         response.put("currentPage", pageTrans.getNumber());
         response.put("totalItems", pageTrans.getTotalElements());
         response.put("totalPages", pageTrans.getTotalPages());
+        response.put("totalBalance", admin.getAccountBalance());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -99,11 +72,55 @@ public class ViewController {
     @GetMapping("/not-approved-transaction")
     @CrossOrigin
     public ResponseEntity<Map<String, Object>> getNotApprovedTransactionWithPaging(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
-        List<Transaction> transactions;
+        List<NotApprovedTransaction> notApprovedTransactions;
         Pageable paging = PageRequest.of(page, 10);
 
         User user = userService.getUserById(userId);
-        Page<Transaction> pageTrans = transactionService.getTransactionByIsApproved(Const.NOT_APPROVED, paging);
+        Page<NotApprovedTransaction> pageTrans = notApprovedTransactionService.getNotApprovedTransaction(paging);
+        notApprovedTransactions = pageTrans.getContent();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", user.getUsername());
+        response.put("code", user.getCode());
+        response.put("department", user.getDepartment());
+        response.put("transactions", notApprovedTransactions);
+        response.put("currentPage", pageTrans.getNumber());
+        response.put("totalItems", pageTrans.getTotalElements());
+        response.put("totalPages", pageTrans.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/pending-update")
+    public ResponseEntity<Map<String, Object>> getPendingUpdateTransactions(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
+        List<PendingTransaction> pendingTransactions;
+        Pageable pageable = PageRequest.of(page, 10);
+
+        User user = userService.getUserById(userId);
+        Page<PendingTransaction> pageTrans = pendingTransactionService.getPendingUpdateTransactions(pageable);
+
+        pendingTransactions = pageTrans.getContent();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("name", user.getUsername());
+        response.put("code", user.getCode());
+        response.put("department", user.getDepartment());
+        response.put("transactions", pendingTransactions);
+        response.put("currentPage", pageTrans.getNumber());
+        response.put("totalItems", pageTrans.getTotalElements());
+        response.put("totalPages", pageTrans.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/pending-delete")
+    public ResponseEntity<Map<String, Object>> getPendingDeleteTransactions(@RequestParam("userId") long userId, @RequestParam int page) throws NotFoundException {
+        List<Transaction> transactions;
+        Pageable pageable = PageRequest.of(page, 10);
+
+        User user = userService.getUserById(userId);
+        Page<Transaction> pageTrans = transactionService.getAllByPendingDelete(Const.YES, pageable);
+
         transactions = pageTrans.getContent();
 
         Map<String, Object> response = new HashMap<>();
@@ -118,9 +135,4 @@ public class ViewController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/anjink")
-    public ResponseEntity<User> anjing(@RequestBody Map<String, String> request){
-        User user = userService.getUserByUsername(request.get("username"));
-        return new ResponseEntity<>(userService.changePassword(user.getUserId(), request.get("password")), HttpStatus.OK);
-    }
 }

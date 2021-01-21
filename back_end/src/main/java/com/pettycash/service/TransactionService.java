@@ -1,11 +1,9 @@
 package com.pettycash.service;
 
-import java.util.List;
-
+import com.pettycash.entity.PendingTransaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.pettycash.dto.LandingPageDTO;
 import com.pettycash.dto.TransactionDTO;
 import com.pettycash.entity.Transaction;
 import com.pettycash.entity.TransactionType;
@@ -14,25 +12,22 @@ import com.pettycash.entity.User;
 import javassist.NotFoundException;
 
 public interface TransactionService {
-    Transaction addTransaction(TransactionDTO dto, User user, TransactionType transactionType);
+    Transaction addTransaction(TransactionDTO dto ,User user, TransactionType transactionType) throws NotFoundException;
 
-    List<Transaction> getAllByUser(User user);
-
-    LandingPageDTO getView(User user, List<Transaction> transaction);
-
-    Page<Transaction> getAllWithPaging(User user, Pageable pageable);
+    Page<Transaction> getAllWithPaging(Pageable pageable);
 
     boolean deleteTransaction(long transactionId);
 
     boolean updateTransaction(long transactionId, TransactionDTO dto, long userId) throws NotFoundException;
 
+    boolean updateTransaction(long transactionId, PendingTransaction pendingTransaction, long userId) throws NotFoundException;
+
     Transaction getById(long transactionId);
 
     void updateTransactionImageName(Transaction transaction, String name);
 
-    List<Transaction> getAllByUserAndIsApproved(User user, String isApproved);
+    Page<Transaction> getAllByPendingDelete(String pendingDelete, Pageable pageable);
 
-    Transaction approveTransaction(long transactionId, long userId) throws NotFoundException;
+    void setPendingDeleteUpdate(long transactionId, String update);
 
-    Page<Transaction> getTransactionByIsApproved(String isApproved, Pageable pageable);
 }

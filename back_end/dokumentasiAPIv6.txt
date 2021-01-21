@@ -7,41 +7,6 @@ requestBody =
     "password" : String
 }
 
-8081/pettycash/v1/view/getTransaction?userId=1&page={page} (landing page / view page) (get)
-return = 
-{
-	"totalItems": int (total transactions)
-    "code": String,
-    "name": String,
-    "totalPages": int,
-    "department": String,
-    "transactions": [
-        {
-            "transactionId": long,
-            "description": String,
-            "receipt": String ("income" / "outcome"),
-            "amount": long,
-            "transactionDate": Date,
-            "transactionType": {
-                "transactionTypeId": long,
-                "transactionTypeName": String,
-                "createdDate": Date,
-                "updatedDate": Date
-            },
-            "residue": long,
-            "user": {
-                "userId": long,
-                "code": String,
-                "department": String,
-                "startBalance": long,
-                "name": String,
-                "accountBalance": long
-            }
-        }
-    ],
-    "currentPage": int (STARTS FROM 0)
-}
-
 8081/pettycash/v1/view/getTransactionType (get)
 return =
 {
@@ -65,6 +30,7 @@ requestBody =
 	"userId" : long (1)
 }
 8081/pettycash/v1/transaction/update?transactionId={transactionId} (post)
+
 requestBody =
 {
 	"description" : String,
@@ -74,7 +40,7 @@ requestBody =
 	"receipt" : String ("income"/"outcome")
 }
 
-8081/pettycash/v1/transaction/delete?transactionId={transactionId} (get)
+8081/pettycash/v1/transaction/delete?userId={userId}&transactionId={transactionId} (get)
 return =
 {
 	"response": String,
@@ -104,7 +70,9 @@ return =
                 "startBalance": long,
                 "name": String,
                 "accountBalance": long
-            }
+            },
+            "pendingDelete" : String (y/n),
+            "pendingUpdate" : String (y/n)
         }
 
 8081/pettycash/v1/view/not-approved-transaction?userId={userId}&page={page}
@@ -170,11 +138,101 @@ return =
                         "startBalance": long,
                         "name": String,
                         "accountBalance": long
-                    }
+                    },
+                     "pendingDelete" : String (y/n),
+                     "pendingUpdate" : String (y/n)
                 }
             ],
             "currentPage": int (STARTS FROM 0)
 }
+
+8081/pettycash/v1/view/pending-delete?userId={userId}&page={page}
+return =
+        {
+        	"totalItems": int (total transactions)
+            "code": String,
+            "name": String,
+            "totalPages": int,
+            "department": String,
+            "transactions": [
+                {
+                    "transactionId": long,
+                    "description": String,
+                    "receipt": String ("income" / "outcome"),
+                    "amount": long,
+                    "transactionDate": Date,
+                    "transactionType": {
+                        "transactionTypeId": long,
+                        "transactionTypeName": String,
+                        "createdDate": Date,
+                        "updatedDate": Date
+                    },
+                    "residue": long,
+                    "user": {
+                        "userId": long,
+                        "code": String,
+                        "department": String,
+                        "startBalance": long,
+                        "name": String,
+                        "accountBalance": long
+                    },
+                    "pendingDelete" : String (y/n),
+                    "pendingUpdate" : String (y/n)
+                }
+            ],
+            "currentPage": int (STARTS FROM 0)
+}
+
+8081/pettycash/v1/view/pending-update?userId={userId}&page={page}
+return =
+        {
+        	"totalItems": int (total transactions)
+            "code": String,
+            "name": String,
+            "totalPages": int,
+            "department": String,
+            "transactions": [
+                {
+                    "pendingTransactionId" : long,
+                    "transactionId": long,
+                    "description": String,
+                    "receipt": String ("income" / "outcome"),
+                    "amount": long,
+                    "transactionDate": Date,
+                    "transactionType": {
+                        "transactionTypeId": long,
+                        "transactionTypeName": String,
+                        "createdDate": Date,
+                        "updatedDate": Date
+                    },
+                    "user": {
+                        "userId": long,
+                        "code": String,
+                        "department": String,
+                        "startBalance": long,
+                        "name": String,
+                        "accountBalance": long
+                    },
+                    "pendingDelete" : String (y/n),
+                    "pendingUpdate" : String (y/n)
+                }
+            ],
+            "currentPage": int (STARTS FROM 0)
+}
+
+8081/pettycash/v1/transaction/edit-pending? (POST)
+body :
+            {
+                "pendingTransactionId" : long,
+                "transactionTypeId" : long,
+                "amount" : long,
+                "description" : String,
+                "receipt" : String,
+            }
+
+8081/pettycash/v1/transaction/reject-delete?transactionId={transactionId} (GET)
+8081/pettycash/v1/transaction/reject-update?transactionId={transactionId} (GET)
+
 tambahan transaction id: 
 1. gakepake
 2. Transportation

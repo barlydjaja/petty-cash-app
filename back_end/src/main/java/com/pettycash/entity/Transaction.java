@@ -59,7 +59,10 @@ public class Transaction implements Serializable{
 	@Column(name = "picture_name")
 	private String fileName;
 
-	@Column(name = "is_approved", columnDefinition = "varchar(50) default 'not_approved'")
-	private String isApproved;
+	@Column(name = "pending_update", columnDefinition = "varchar(50) default 'n'")
+	private String pendingUpdate;
+
+	@Column(name = "pending_delete", columnDefinition = "varchar(50) default 'n'")
+	private String pendingDelete;
 	
 }

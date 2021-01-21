@@ -4,7 +4,6 @@ import com.pettycash.dto.UploadFileResponse;
 import com.pettycash.service.UploadFileService;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 @CrossOrigin
 @RestController
@@ -44,7 +40,7 @@ public class FileController {
     public ResponseEntity<Resource> downloadFIle(@PathVariable("transactionId") long transactionId, HttpServletRequest request) throws IOException {
         Resource resource = uploadFileService.loadFile(transactionId);
 
-        String contentType = null;
+        String contentType;
         try{
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException e) {

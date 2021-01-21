@@ -4,7 +4,6 @@ import com.pettycash.en.Const;
 import com.pettycash.entity.Role;
 import com.pettycash.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +13,6 @@ import com.pettycash.repository.UserRepository;
 import com.pettycash.service.UserService;
 
 import javassist.NotFoundException;
-import sun.security.util.Password;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {

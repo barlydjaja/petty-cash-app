@@ -1,29 +1,36 @@
 <template>
   <div class="background">
     <Header />
+    <b-alert
+      class="alertUnathorized text-center"
+      variant="danger"
+      v-model="showDismissibleAlert"
+      >Unathorized!</b-alert
+    >
     <b-container class="my-5 vh-75">
       <b-jumbotron class="pt-4">
         <b-row class="align-items-center">
           <b-col sm="9">
             <div class="username font-weight-bold">
-              Username: dumy text
+              Username: {{ username }}
             </div>
             <br />
-            <div class="balance">
-              Current Balance: Rp. 1
-            </div>
           </b-col>
         </b-row>
-        <div class="new-transaction mt-2">Transaksi Baru</div>
+        <div class="new-transaction mt-2">{{ $t("newTransaction") }}</div>
         <b-row class="mt-3 font-weight-bold">
-          <b-col class="number"> Tanggal </b-col>
-          <b-col class="transaction">Transaksi</b-col>
-          <b-col class="date">Deskripsi</b-col>
-          <b-col class="income-expenses">mutasi</b-col>
-          <b-col class="ending-balance">Approval</b-col>
+          <b-col class="number" sm="2"> {{ $t("date") }} </b-col>
+          <b-col class="transaction" sm="2">{{ $t("transaction2") }}</b-col>
+          <b-col class="date" sm="3">{{ $t("description") }}</b-col>
+          <b-col class="date" sm="3">{{ $t("mutation") }}</b-col>
+          <b-col class="approval" sm="2">Approval</b-col>
         </b-row>
+        <hr />
 
-        <Approvals v-bind:userApprovals="userApprovals" />
+        <Approvals
+          v-bind:userApprovals="userApprovals"
+          v-on:unathorized="onUnathorized"
+        />
       </b-jumbotron>
     </b-container>
     <Footer />
@@ -34,7 +41,7 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import axios from "axios";
-import Approvals from "../components/Approval";
+import Approvals from "../components/Approvals";
 
 export default {
   name: "Approval",
@@ -46,13 +53,26 @@ export default {
 
   data() {
     return {
+      username: localStorage.getItem("username"),
       userData: [],
-      userTransactions: [],
+      userApprovals: [],
       totalItems: 0,
       accountBalance: 0,
       pages: 1,
       totalPages: 1,
+      showDismissibleAlert: false,
     };
+  },
+
+  methods: {
+    onUnathorized() {
+      this.showDismissibleAlert = true;
+      setTimeout(() => {
+        this.showDismissibleAlert = false;
+      }, 2000);
+      // console.log("received");
+      // this.$emit("fromApprovalPage", 1);
+    },
   },
 
   created() {
@@ -62,8 +82,8 @@ export default {
     if (localStorage.getItem("token")) {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/getTransaction?userId=1&page=${0}`;
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,8 +93,7 @@ export default {
         .get(url, config)
         .then((res) => {
           this.userData = res.data;
-          this.userTransactions = res.data.transactions;
-          this.accountBalance = res.data.transactions[0].user.accountBalance;
+          this.userApprovals = res.data.transactions;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
           console.log(res.data);
@@ -89,5 +108,14 @@ export default {
 <style scoped>
 .vh-75 {
   min-height: 75vh !important;
+}
+
+.alertUnathorized {
+  position: fixed;
+  width: 200px;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
 }
 </style>

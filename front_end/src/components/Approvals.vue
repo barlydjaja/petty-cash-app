@@ -1,49 +1,48 @@
 <template>
   <div>
-    <hr />
-
     <div
       class="transactions"
-      v-for="(userTransaction, index) in userTransactions"
+      v-for="(userApproval, index) in userApprovals"
       v-bind:key="index"
     >
+      <!-- <div v-if="userApproval.isApproved === 'not_approved'"> -->
       <b-row>
         <b-col sm="2">
-          {{ userTransaction.transactionDate.split("T")[0] }}
+          {{ userApproval.transactionDate.split("T")[0] }}
         </b-col>
         <b-col sm="2">
-          {{ userTransaction.transactionType.transactionTypeName }}
+          {{ userApproval.transactionType.transactionTypeName }}
         </b-col>
-        <b-col>
-          {{ userTransaction.description }}
+        <b-col sm="3">
+          {{ userApproval.description }}
         </b-col>
         <b-col
           v-bind:class="
-            userTransaction.receipt === 'income' ? 'income' : 'expenses'
+            userApproval.receipt === 'income' ? 'income' : 'expenses'
           "
-          sm="2"
+          sm="3"
         >
           {{
-            userTransaction.receipt === "income"
-              ? `+${userTransaction.amount}`
-              : `${userTransaction.amount}`
+            userApproval.receipt === "income"
+              ? `+Rp.${userApproval.amount}`
+              : `Rp.${userApproval.amount}`
           }}
         </b-col>
-        <b-col sm="2"> Rp. {{ userTransaction.residue }} </b-col>
+
         <b-col sm="2">
           <b-button
             v-b-modal="'my-modal'"
-            @click="(e) => handleEdit(e, userTransaction.transactionId)"
-            class="btn btn-sm"
+            @click="(e) => handleEdit(e, userApproval.transactionId)"
+            class="btn btn-sm "
           >
             <ClipboardEdit />
           </b-button>
 
           <b-button
-            v-if="!userTransaction.fileName"
+            v-if="!userApproval.fileName"
             v-b-modal="'upload'"
             class="btn btn-sm mx-1"
-            @click="(e) => handleUpload(e, userTransaction.transactionId)"
+            @click="(e) => handleUpload(e, userApproval.transactionId)"
           >
             <CloudUpload />
           </b-button>
@@ -52,26 +51,26 @@
             v-auth-href="{ token: token }"
             v-bind:href="
               'http://10.69.72.89:8081/pettycash/v1/file/download/' +
-                userTransaction.transactionId
+                userApproval.transactionId
             "
-            v-if="userTransaction.fileName"
+            v-if="userApproval.fileName"
             class="btn btn-sm btn-secondary mx-1"
           >
             <Download />
           </a>
-
-          <span
-            v-b-modal="'delete'"
-            class="btn btn-sm btn-danger"
-            @click="(e) => onDelete(e, userTransaction.transactionId)"
+          <b-button
+            v-b-modal.modalApprove
+            class="btn btn-sm"
+            @click="(e) => handleApprove(e, userApproval.notTransactionId)"
           >
-            <Delete />
-          </span>
+            <CheckboxMarked />
+          </b-button>
         </b-col>
       </b-row>
-
       <hr />
+      <!-- </div> -->
     </div>
+
     <b-modal id="my-modal" title="Edit Transaksi" hide-footer>
       <div>
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">
@@ -134,10 +133,14 @@
           <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
         </b-form>
-        <!-- <b-card class="mt-3" header="Form Data Result">
+        <b-card class="mt-3" header="Form Data Result">
           <pre class="m-0">{{ form }}</pre>
-        </b-card> -->
+        </b-card>
       </div>
+    </b-modal>
+
+    <b-modal id="modalApprove" @ok="handleOk" hide-header centered>
+      <h1 class="text-center">Approve Transaction?</h1>
     </b-modal>
     <b-modal
       id="upload"
@@ -156,44 +159,34 @@
       </label>
       <!-- <button v-on:click="submitFile()">Submit</button> -->
     </b-modal>
-    <b-modal
-      id="delete"
-      @ok="handleDelete()"
-      hide-header
-      centered
-      ok-variant="danger"
-    >
-      <h4 class="lead text-center">
-        Delete Transaction?
-      </h4>
-      <!-- <button v-on:click="submitFile()">Submit</button> -->
-    </b-modal>
   </div>
 </template>
 
 <script>
+import CheckboxMarked from "vue-material-design-icons/CheckboxMarked";
+import ClipboardEdit from "vue-material-design-icons/ClipboardEdit";
+import CloudUpload from "vue-material-design-icons/CloudUpload";
+import Download from "vue-material-design-icons/Download";
 import axios from "axios";
-import ClipboardEdit from "vue-material-design-icons/ClipboardEdit.vue";
-import CloudUpload from "vue-material-design-icons/CloudUpload.vue";
-import Download from "vue-material-design-icons/Download.vue";
-import Delete from "vue-material-design-icons/Delete.vue";
 
-// import EditTransaction from "../components/EditTransaction";
 let authHeader = `Bearer + ${localStorage.getItem("token")}`;
 axios.defaults.headers.common["Authorization"] = authHeader;
+
 export default {
-  name: "transaction",
-  props: ["userTransactions"],
+  name: "Approvals",
+  props: ["userApprovals"],
   data() {
     return {
-      transactionId: 1,
+      transactionId: 0,
+      token: localStorage.getItem("token"),
+      form: {
+        userId: localStorage.getItem("userId"),
+      },
+      show: true,
       description: "",
       receipt: "",
       transactionType: "",
       amount: 0,
-      form: {
-        userId: localStorage.getItem("userId"),
-      },
       transactions: [
         { text: "Select One", value: null },
         { text: "Transportation", value: 2 },
@@ -213,49 +206,39 @@ export default {
         { text: "Income", value: "income" },
         { text: "Expenses", value: "outcome" },
       ],
-      show: true,
-      file: "",
-      token: localStorage.getItem("token"),
     };
   },
+
   components: {
-    ClipboardEdit,
+    CheckboxMarked,
     CloudUpload,
     Download,
-    Delete,
+    ClipboardEdit,
   },
   methods: {
-    onDelete(e, id) {
-      e.preventDefault();
-      this.transactionId = id;
-    },
-
-    handleDelete: function() {
-      const urlDel = `http://10.69.72.89:8081/pettycash/v1/transaction/delete?transactionId=${this.transactionId} `;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-      axios.get(urlDel, config).then((res) => {
-        if (res.status === 200) this.$router.go();
-      });
-    },
-
     handleEdit(e, id) {
       e.preventDefault();
       this.transactionId = id;
     },
 
-    handleUpload(e, id) {
-      e.preventDefault();
-      this.transactionId = id;
+    onReset(event) {
+      event.preventDefault();
+      // Reset our form values
+      this.form.description = "";
+      this.form.receipt = "";
+      this.form.transactionTypeId = 0;
+      this.form.amount = 0;
+      // Trick to reset/clear native browser form validation state
+      this.show = false;
+      this.$nextTick(() => {
+        this.show = true;
+      });
     },
 
     onSubmit(event) {
       event.preventDefault();
       const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update?transactionId=${this.transactionId}`;
-      // console.log(this.form);
+      console.log(this.transactionId);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       };
@@ -263,11 +246,19 @@ export default {
         .post(url, this.form, config)
         .then((res) => {
           if (res.status === 200) this.$router.go();
+          // console.log(res.data);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("unathorized", err);
+        });
       // alert(JSON.stringify(this.form));
       // console.log(this.form);
       // console.log(this.transactionId);
+    },
+
+    handleUpload(e, id) {
+      e.preventDefault();
+      this.transactionId = id;
     },
 
     handleFileUpload() {
@@ -295,50 +286,46 @@ export default {
         .catch((err) => console.log(err));
     },
 
-    onReset(event) {
-      event.preventDefault();
-      // Reset our form values
-      this.form.description = "";
-      this.form.receipt = "";
-      this.form.transactionTypeId = 0;
-      this.form.amount = 0;
-      // Trick to reset/clear native browser form validation state
-      this.show = false;
-      this.$nextTick(() => {
-        this.show = true;
-      });
+    handleApprove(e, id) {
+      e.preventDefault();
+      this.transactionId = id;
+      console.log(`id of ${this.transactionId} approved`);
     },
 
-    checkFile() {},
+    handleOk(e) {
+      e.preventDefault();
+      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/approve?userId=${localStorage.getItem(
+        "userId"
+      )}&transactionId=${this.transactionId}`;
+      console.log(localStorage.getItem("userId"));
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      };
+      axios
+        .get(url, config)
+        .then((res) => {
+          console.log(res.data);
+          if (res.status === 200) this.$router.go();
+        })
+        .catch((err) => {
+          console.log("user unathorized", err.message);
+          this.$emit("unathorized", 1);
+        });
+      this.$nextTick(() => {
+        this.$bvModal.hide("modalApprove");
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
-.btn-del {
-  width: 100%;
-  height: 100%;
-}
-
 .income {
   color: green;
 }
 .expenses {
   color: red;
-}
-
-.btn-secondary {
-  color: #fdcb5a;
-  background-color: #1a3150;
-}
-
-.btn-secondary:hover {
-  color: #fdcb5a;
-  background-color: #1a3150;
-}
-
-.btn-secondary:focus {
-  color: #fdcb5a;
-  background-color: #1a3150;
 }
 </style>

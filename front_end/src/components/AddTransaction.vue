@@ -11,6 +11,7 @@
         id="modal-prevent-closing-2"
         ref="modal"
         title="Masukan Transaksi"
+        hide-footer
       >
         <div>
           <b-form @submit="onSubmit" @reset="onReset" v-if="show">
@@ -90,7 +91,7 @@ export default {
   data() {
     return {
       form: {
-        userId: 1,
+        userId: localStorage.getItem("userId"),
       },
       transactions: [
         { text: "Select One", value: null },
@@ -117,20 +118,24 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      console.log(localStorage.getItem("token"));
-      const url = "http://10.69.72.89:8081/pettycash/v1/add/addTransaction";
+      // console.log(localStorage.getItem("token"));
+      const url = "http://10.69.72.89:8081/pettycash/v1/transaction/add";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
-      console.log(this.form);
+      // console.log(this.form);
       axios
         .post(url, this.form, config)
         .then((res) => {
-          console.log(res);
+          // console.log(localStorage.getItem("userId"));
           if (res.status === 200) {
-            this.$router.go();
+            if (Number(localStorage.getItem("userId")) === 1)
+              return this.$router.go();
+
+            if (Number(localStorage.getItem("userId")) === 2)
+              return this.$router.push("/approval");
           }
         })
         .then(this.$bvModal.hide("modal-prevent-closing-2"))

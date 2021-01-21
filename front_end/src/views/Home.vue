@@ -3,16 +3,14 @@
     <Header />
     <div class="background">
       <b-container>
-        <div class="main-text pt-5">Atur Keuanganmu</div>
+        <div class="main-text pt-5">{{ $t("title") }}</div>
         <hr class="hr-top" />
-        <div class="sub-text mb-5">Tak Perlu Repot Membuat Data Keuanganmu</div>
+        <div class="sub-text mb-5">{{ $t("subTitle") }}</div>
       </b-container>
       <!-- jumbotron start -->
       <div>
-        <b-jumbotron
-          header="Cara Kerja Petty Cash"
-          class="text-center pt-3 mt-5 w-100 mb-0"
-        >
+        <b-jumbotron class="text-center pt-3 mt-5 w-100 mb-0">
+          <h1 class="display-3">{{ $t("procedure") }}</h1>
           <hr class="hr-mid mb-4" />
           <b-row class="mb-5">
             <b-col class="font-weight-bold">
@@ -23,7 +21,7 @@
                 class="mb-3"
               />
               <br />
-              Login/Register</b-col
+              {{ $t("loginRegister") }}</b-col
             >
             <b-col class="font-weight-bold">
               <img
@@ -33,7 +31,7 @@
                 class="mb-3"
               />
               <br />
-              Masukan Pemasukan</b-col
+              {{ $t("income") }}</b-col
             >
             <b-col class="font-weight-bold">
               <img
@@ -43,7 +41,7 @@
                 class="mb-3"
               />
               <br />
-              Masukan Pengeluaran</b-col
+              {{ $t("expenses") }}</b-col
             >
             <b-col class="font-weight-bold">
               <img
@@ -53,14 +51,14 @@
                 class="mb-3"
               />
               <br />
-              Lihat Transaksi</b-col
+              {{ $t("transaction") }}</b-col
             >
           </b-row>
 
           <div href="#" class="more-info-btn">
             <router-link to="/demo">
               <span class="button-text-center">
-                MULAI SEKARANG!
+                {{ $t("startNow") }}
               </span>
             </router-link>
           </div>

@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "element-ui/lib/theme-chalk/index.css";
 import ElementUI from "element-ui";
+import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
@@ -19,6 +20,7 @@ Vue.use(VueAuthHref);
 Vue.use(ElementUI);
 
 Vue.component("pagination", Pagination);
+Vue.component("pacman-loader", PacmanLoader);
 
 new Vue({
   router,

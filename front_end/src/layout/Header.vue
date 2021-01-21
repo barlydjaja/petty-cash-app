@@ -110,9 +110,11 @@
                   <button class="dropbtn">Hi, {{ this.username }}</button>
                   <div class="dropdown-content">
                     <router-link to="/approval"> Approval </router-link>
+                    <router-link to="/edited">Edited</router-link>
+                    <router-link to="/deleted">Deleted</router-link>
                     <router-link to="/transaction">Transaction</router-link>
                     <hr />
-                    <a href="/" @click="handleLogout">Logout</a>
+                    <a href="#" @click="handleLogout">Logout</a>
                   </div>
                 </div>
               </div>
@@ -184,6 +186,7 @@ export default {
         .then((res) => {
           console.log(res.data);
           localStorage.setItem("token", res.data.token);
+          localStorage.setItem("roleId", res.data.role.roleId);
           localStorage.setItem("userId", res.data.userId);
           localStorage.setItem("username", res.data.role.roleName);
           this.username = this.form.username;
@@ -217,9 +220,8 @@ export default {
     handleLogout() {
       localStorage.clear();
       console.log(localStorage.getItem("token"));
-      // this.$router.push("/");
-      this.$forceUpdate();
-      this.$router.go();
+      this.$router.push("/");
+      // this.$router.go();
     },
 
     changeLocale(locale) {

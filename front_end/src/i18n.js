@@ -30,6 +30,8 @@ const messages = {
     description: "Description",
     mutation: "Mutation",
     endBalance: "End Balance",
+    addTransaction: "Add Transaction",
+    amount: "Amount",
   },
   id: {
     about: "Tentang",
@@ -51,9 +53,11 @@ const messages = {
     newTransaction: "Transaksi Baru",
     date: "Tanggal",
     transaction2: "Transaksi",
-    descrition: "Deskripsi",
+    description: "Deskripsi",
     mutation: "Mutasi",
     endBalance: "Sisa Saldo",
+    addTransaction: "Tambah Transaksi",
+    amount: "Jumlah",
   },
 };
 

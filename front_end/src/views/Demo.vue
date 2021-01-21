@@ -85,7 +85,7 @@ export default {
       axios
         .get(url, config)
         .then((res) => {
-          // console.log(res.data);
+          console.log(res.data);
           this.userData = res.data;
           this.userTransactions = res.data.transactions;
           this.accountBalance = res.data.transactions[0].user.accountBalance;

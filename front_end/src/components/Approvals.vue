@@ -62,6 +62,7 @@
             v-b-modal.modalApprove
             class="btn btn-sm"
             @click="(e) => handleApprove(e, userApproval.notTransactionId)"
+            v-if="Number(role) === 1"
           >
             <CheckboxMarked />
           </b-button>
@@ -177,6 +178,7 @@ export default {
   props: ["userApprovals"],
   data() {
     return {
+      role: localStorage.getItem("roleId"),
       transactionId: 0,
       token: localStorage.getItem("token"),
       form: {

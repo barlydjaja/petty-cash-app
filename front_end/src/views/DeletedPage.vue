@@ -10,7 +10,7 @@
     <b-container class="my-5 vh-75">
       <b-jumbotron class="pt-4">
         <b-row class="justify-content-center">
-          <h1>Approval Request</h1>
+          <h1>Delete Request</h1>
         </b-row>
         <hr />
         <b-row class="align-items-center">
@@ -23,15 +23,19 @@
         </b-row>
         <div class="new-transaction mt-2">{{ $t("newTransaction") }}</div>
         <b-row class="mt-3 font-weight-bold">
-          <b-col class="number" sm="2"> {{ $t("date") }} </b-col>
-          <b-col class="transaction" sm="2">{{ $t("transaction2") }}</b-col>
-          <b-col class="date" sm="3">{{ $t("description") }}</b-col>
-          <b-col class="date" sm="3">{{ $t("mutation") }}</b-col>
-          <b-col class="approval" sm="2">Approval</b-col>
+          <b-col class="number text-center" sm="2"> {{ $t("date") }} </b-col>
+          <b-col class="transaction text-center" sm="2">{{
+            $t("transaction2")
+          }}</b-col>
+          <b-col class="date text-center" sm="3">{{ $t("description") }}</b-col>
+          <b-col class="date text-center" sm="2">{{ $t("mutation") }}</b-col>
+          <b-col class="approval text-center" sm="3" v-if="Number(role) === 1"
+            >Delete</b-col
+          >
         </b-row>
         <hr />
 
-        <Approvals
+        <Deleted
           v-bind:userApprovals="userApprovals"
           v-on:unathorized="onUnathorized"
         />
@@ -45,14 +49,14 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import axios from "axios";
-import Approvals from "../components/Approvals";
+import Deleted from "../components/Deleted";
 
 export default {
-  name: "Approval",
+  name: "DeletedPage",
   components: {
     Header,
     Footer,
-    Approvals,
+    Deleted,
   },
 
   data() {
@@ -65,6 +69,7 @@ export default {
       pages: 1,
       totalPages: 1,
       showDismissibleAlert: false,
+      role: localStorage.getItem("roleId"),
     };
   },
 
@@ -86,7 +91,9 @@ export default {
     if (localStorage.getItem("token")) {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/pending-delete?userId=${localStorage.getItem(
+        "userId"
+      )}&page=${0}`;
 
       const config = {
         headers: {

@@ -10,7 +10,7 @@
     <b-container class="my-5 vh-75">
       <b-jumbotron class="pt-4">
         <b-row class="justify-content-center">
-          <h1>Approval Request</h1>
+          <h1>Edit Request</h1>
         </b-row>
         <hr />
         <b-row class="align-items-center">
@@ -26,12 +26,12 @@
           <b-col class="number" sm="2"> {{ $t("date") }} </b-col>
           <b-col class="transaction" sm="2">{{ $t("transaction2") }}</b-col>
           <b-col class="date" sm="3">{{ $t("description") }}</b-col>
-          <b-col class="date" sm="3">{{ $t("mutation") }}</b-col>
-          <b-col class="approval" sm="2">Approval</b-col>
+          <b-col class="date" sm="2">{{ $t("amount") }}</b-col>
+          <b-col class="approval" sm="3">Approval</b-col>
         </b-row>
         <hr />
 
-        <Approvals
+        <Edited
           v-bind:userApprovals="userApprovals"
           v-on:unathorized="onUnathorized"
         />
@@ -45,14 +45,14 @@
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import axios from "axios";
-import Approvals from "../components/Approvals";
+import Edited from "../components/Edited";
 
 export default {
-  name: "Approval",
+  name: "EditedPage",
   components: {
     Header,
     Footer,
-    Approvals,
+    Edited,
   },
 
   data() {
@@ -86,7 +86,9 @@ export default {
     if (localStorage.getItem("token")) {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/pending-update?userId=${localStorage.getItem(
+        "userId"
+      )}&page=${0}`;
 
       const config = {
         headers: {

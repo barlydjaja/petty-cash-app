@@ -1,9 +1,9 @@
 <template>
   <div class="text-center align-center">
     <div>
-      <b-button v-b-modal.modal-prevent-closing-2 class="transaction"
-        >Tambah Transaksi</b-button
-      >
+      <b-button v-b-modal.modal-prevent-closing-2 class="transaction">{{
+        $t("addTransaction")
+      }}</b-button>
 
       <!-- Submitted Names: -->
 

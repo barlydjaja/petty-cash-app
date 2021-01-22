@@ -5,6 +5,8 @@ import Demo from "./views/Demo";
 import About from "./views/About";
 import TransactionPage from "./views/TransactionPage";
 import Approval from "./views/ApprovalPage";
+import Edited from "./views/EditedPage";
+import Deleted from "./views/DeletedPage";
 
 Vue.use(VueRouter);
 
@@ -16,5 +18,7 @@ export const router = new VueRouter({
     { path: "/about", component: About },
     { path: "/transaction", component: TransactionPage },
     { path: "/approval", component: Approval },
+    { path: "/edited", component: Edited },
+    { path: "/deleted", component: Deleted },
   ],
 });

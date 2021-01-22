@@ -2,8 +2,13 @@
   <div class="background">
     <Header />
     <b-container class="my-5 ">
-      <b-jumbotron class="pt-4">
-        <b-row class="align-items-center">
+      <b-jumbotron class="pt-4 vh-75">
+        <b-row class="justify-content-center">
+          <h1>Transaction</h1>
+        </b-row>
+        <hr />
+
+        <b-row class="align-items-center" v-if="!isLoading">
           <b-col sm="9">
             <div class="username font-weight-bold">
               Username: {{ username }}
@@ -29,7 +34,14 @@
           <b-col></b-col>
         </b-row>
 
-        <Transactions v-bind:userTransactions="userTransactions" />
+        <b-row class="justify-content-center">
+          <pacman-loader :loading="this.isLoading"></pacman-loader>
+        </b-row>
+
+        <Transactions
+          v-bind:userTransactions="userTransactions"
+          v-if="!isLoading"
+        />
         <div class="text-center ">
           <pagination
             v-model="pages"
@@ -69,12 +81,14 @@ export default {
       pages: 1,
       totalPages: 1,
       username: localStorage.getItem("username"),
+      isLoading: false,
     };
   },
 
   methods: {
     handlePageChange(pageNumber) {
-      console.log(pageNumber);
+      this.isLoading = true;
+      // console.log(pageNumber);
       let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
         "userId"
       )}&page=${pageNumber - 1}`;
@@ -90,11 +104,11 @@ export default {
           // console.log(res.data);
           this.userData = res.data;
           this.userTransactions = res.data.transactions;
-          this.accountBalance = res.data.transactions[0].user.accountBalance;
+          this.accountBalance = res.data.totalBalance;
           this.totalItems = res.data.totalItems;
-
+          this.isLoading = false;
           // console.log(res.data);
-          // console.log(res.data.transactions);
+          console.log(res.data.transactions);
         })
         .catch((err) => console.log(err));
     },
@@ -105,11 +119,13 @@ export default {
     // console.log("user id is: " + localStorage.getItem("userId"));
 
     if (localStorage.getItem("token")) {
+      this.isLoading = true;
       let page = this.pages;
       if (this.pages === 0) this.page = 0;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=2&page=${page -
-        1}`;
+      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
+        "userId"
+      )}&page=${page - 1}`;
 
       const config = {
         headers: {
@@ -121,12 +137,13 @@ export default {
         .then((res) => {
           this.userData = res.data;
           this.userTransactions = res.data.transactions;
-          if (res.data.transactions[0])
-            this.accountBalance = res.data.transactions[0].user.accountBalance;
+          if (res.data.totalBalance)
+            this.accountBalance = res.data.totalBalance;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
           console.log(res.data);
           console.log(res.data.transactions);
+          this.isLoading = false;
         })
         .catch((err) => console.log(err));
     }
@@ -142,5 +159,9 @@ export default {
 
 .pagination {
   justify-content: center;
+}
+
+.vh-75 {
+  min-height: 75vh !important;
 }
 </style>

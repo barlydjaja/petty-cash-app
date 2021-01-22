@@ -6,6 +6,8 @@
     <router-link to="/login" />
     <router-link to="/transaction" />
     <router-link to="/approval"></router-link>
+    <router-link to="/edited" />
+    <router-link to="/delted" />
     <router-view />
     <h1></h1>
   </div>

@@ -80,6 +80,11 @@ export default {
     Header,
     Footer,
   },
+  data() {
+    return {
+      isLoading: false,
+    };
+  },
 };
 </script>
 

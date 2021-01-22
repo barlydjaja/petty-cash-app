@@ -14,4 +14,5 @@ public interface PendingTransactionService {
     void deletePendingTransaction(long transactionId);
     Page<PendingTransaction> getPendingUpdateTransactions(Pageable pageable);
     PendingTransaction updatePendingTransaction(Map<String, Object> request) throws NotFoundException;
+    void updateBasic(PendingTransaction pendingTransaction);
 }

@@ -1,4 +1,5 @@
-8081/pettycash/v1/file/upload (post)
+8081/pettycash/v1/file/upload?transactionId={transactionId} (post)
+param = file (MultipartFile)
 
 8081/pettycash/secured/login (post)
 requestBody =
@@ -232,6 +233,15 @@ body :
 
 8081/pettycash/v1/transaction/reject-delete?transactionId={transactionId} (GET)
 8081/pettycash/v1/transaction/reject-update?transactionId={transactionId} (GET)
+
+8081/pettycash/v1/view/update-approve (POST)
+{
+                "notTransactionId" : long,
+                "transactionTypeId" : long,
+                "amount" : long,
+                "description" : String,
+                "receipt" : String,
+}
 
 tambahan transaction id: 
 1. gakepake

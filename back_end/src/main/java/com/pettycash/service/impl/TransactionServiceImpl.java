@@ -1,8 +1,15 @@
 package com.pettycash.service.impl;
 
+import java.io.*;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.pettycash.en.Const;
 import com.pettycash.entity.PendingTransaction;
@@ -10,6 +17,8 @@ import com.pettycash.repository.PendingTransactionRepository;
 import com.pettycash.service.PendingTransactionService;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,10 +32,13 @@ import com.pettycash.repository.TransactionRepository;
 import com.pettycash.service.TransactionService;
 import com.pettycash.service.TransactionTypeService;
 import com.pettycash.service.UserService;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+    private static final String uploadDir = "/pettycash/dir";
     private final TransactionRepository repo;
     private final UserService userService;
     private final TransactionTypeService typeService;
@@ -264,9 +276,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public boolean updateTransaction(long transactionId, PendingTransaction pendingTransaction, long userId) throws NotFoundException {
+    public boolean updateTransaction(long transactionId, PendingTransaction pendingTransaction, long userId) throws NotFoundException, IOException {
         User admin = userService.getUserById(1);
         TransactionDTO dto = new TransactionDTO();
+        Transaction transaction = repo.getOne(transactionId);
 
             pendingTransaction = pendingTransactionService.getByTransactionId(transactionId);
             dto.setDate(pendingTransaction.getTransactionDate());
@@ -276,12 +289,36 @@ public class TransactionServiceImpl implements TransactionService {
             dto.setDescription(pendingTransaction.getDescription());
             dto.setTransactionTypeId(pendingTransaction.getTransactionType().getTransactionTypeId());
 
-            pendingTransactionService.deletePendingTransaction(pendingTransaction.getPendingTransactionId());
+            if(pendingTransaction.getFileName() != null){
+
+                Path fileStorageLocation = Paths.get(uploadDir.concat("\\").concat("pending-update").concat("\\").concat(String.valueOf(transactionId).concat("\\").concat(pendingTransaction.getFileName())))
+                        .toAbsolutePath()
+                        .normalize();
+
+                Path folder = Paths.get(uploadDir.concat("\\").concat("pending-update").concat("\\").concat(String.valueOf(transactionId)))
+                        .toAbsolutePath()
+                        .normalize();
+
+                Path targetStorage = Paths.get(uploadDir.concat("\\").concat(String.valueOf(userId)).concat("\\").concat(String.valueOf(transactionId)))
+                        .toAbsolutePath()
+                        .normalize();
+
+                Files.createDirectories(targetStorage);
+
+                File file = new File(uploadDir.concat("/").concat("pending-update").concat("/").concat(pendingTransaction.getFileName()));
+                targetStorage = targetStorage.resolve(StringUtils.cleanPath(Objects.requireNonNull(file.getName())));
+                Files.copy(fileStorageLocation, targetStorage, StandardCopyOption.REPLACE_EXISTING);
+                Files.deleteIfExists(fileStorageLocation);
+                Files.deleteIfExists(folder);
+
+                transaction.setFileName(pendingTransaction.getFileName());
+            }
+
+            pendingTransactionService.deletePendingTransaction(transaction.getTransactionId());
 
         boolean result;
 
         try {
-            Transaction transaction = repo.getOne(transactionId);
 
             if (!dto.getDescription().equalsIgnoreCase(transaction.getDescription())) {
                 transaction.setDescription(dto.getDescription());

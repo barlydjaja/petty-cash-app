@@ -40,6 +40,7 @@
 
         <Transactions
           v-bind:userTransactions="userTransactions"
+          v-on:edit-twice="onEditTwice"
           v-if="!isLoading"
         />
         <div class="text-center ">
@@ -82,12 +83,21 @@ export default {
       totalPages: 1,
       username: localStorage.getItem("username"),
       isLoading: false,
+      showDismissibleAlert: false,
     };
   },
 
   methods: {
+    onEditTwice() {
+      this.showDismissibleAlert = true;
+      setTimeout(() => {
+        this.showDismissibleAlert = false;
+      }, 2000);
+    },
+
     handlePageChange(pageNumber) {
       this.isLoading = true;
+      this.pages = pageNumber;
       // console.log(pageNumber);
       let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
         "userId"
@@ -108,7 +118,7 @@ export default {
           this.totalItems = res.data.totalItems;
           this.isLoading = false;
           // console.log(res.data);
-          console.log(res.data.transactions);
+          // console.log(res.data.transactions);
         })
         .catch((err) => console.log(err));
     },
@@ -120,12 +130,12 @@ export default {
 
     if (localStorage.getItem("token")) {
       this.isLoading = true;
-      let page = this.pages;
-      if (this.pages === 0) this.page = 0;
+      // let page = this.pages;
+      // if (this.pages === 0) this.page = 0;
 
       const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
         "userId"
-      )}&page=${page - 1}`;
+      )}&page=${this.pages - 1}`;
 
       const config = {
         headers: {
@@ -141,8 +151,8 @@ export default {
             this.accountBalance = res.data.totalBalance;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
-          console.log(res.data);
-          console.log(res.data.transactions);
+          // console.log(res.data);
+          // console.log(res.data.transactions);
           this.isLoading = false;
         })
         .catch((err) => console.log(err));

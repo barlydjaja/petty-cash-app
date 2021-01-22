@@ -184,7 +184,7 @@ export default {
       axios
         .post(url, this.form)
         .then((res) => {
-          console.log(res.data);
+          // console.log(res.data);
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("roleId", res.data.role.roleId);
           localStorage.setItem("userId", res.data.userId);
@@ -219,7 +219,7 @@ export default {
 
     handleLogout() {
       localStorage.clear();
-      console.log(localStorage.getItem("token"));
+      // console.log(localStorage.getItem("token"));
       this.$router.push("/");
       // this.$router.go();
     },

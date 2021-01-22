@@ -296,9 +296,10 @@ export default {
 
     submitFile() {
       let formData = new FormData();
+      // console.log(formData);
       formData.append("file", this.file);
       formData.append("transactionId", this.transactionId);
-      const url = "http://10.69.72.89:8081/pettycash/v1/file/upload";
+      const url = "http://10.69.72.89:8081/pettycash/v1/file/upload-pending";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -323,8 +324,7 @@ export default {
 
     handleOk(e) {
       e.preventDefault();
-      console.log(this.transactionId);
-      console.log(localStorage.getItem("userId"));
+      console.log("user roleId: " + localStorage.getItem("userId"));
       const url = `http://10.69.72.89:8081/pettycash/v1/transaction/approve-update?transactionId=${
         this.transactionId
       }&userId=${localStorage.getItem("userId")}`;

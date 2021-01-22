@@ -32,20 +32,20 @@
         <b-col sm="2">
           <b-button
             v-b-modal="'my-modal'"
-            @click="(e) => handleEdit(e, userApproval.transactionId)"
-            class="btn btn-sm "
+            @click="(e) => handleEdit(e, userApproval.notTransactionId)"
+            class="btn btn-sm mx-1 "
           >
             <ClipboardEdit />
           </b-button>
 
-          <b-button
+          <!-- <b-button
             v-if="!userApproval.fileName"
             v-b-modal="'upload'"
             class="btn btn-sm mx-1"
             @click="(e) => handleUpload(e, userApproval.transactionId)"
           >
             <CloudUpload />
-          </b-button>
+          </b-button> -->
 
           <a
             v-auth-href="{ token: token }"
@@ -60,7 +60,7 @@
           </a>
           <b-button
             v-b-modal.modalApprove
-            class="btn btn-sm"
+            class="btn btn-sm mx-1"
             @click="(e) => handleApprove(e, userApproval.notTransactionId)"
             v-if="Number(role) === 1"
           >
@@ -134,9 +134,9 @@
           <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
         </b-form>
-        <b-card class="mt-3" header="Form Data Result">
+        <!-- <b-card class="mt-3" header="Form Data Result">
           <pre class="m-0">{{ form }}</pre>
-        </b-card>
+        </b-card> -->
       </div>
     </b-modal>
 
@@ -166,7 +166,7 @@
 <script>
 import CheckboxMarked from "vue-material-design-icons/CheckboxMarked";
 import ClipboardEdit from "vue-material-design-icons/ClipboardEdit";
-import CloudUpload from "vue-material-design-icons/CloudUpload";
+// import CloudUpload from "vue-material-design-icons/CloudUpload";
 import Download from "vue-material-design-icons/Download";
 import axios from "axios";
 
@@ -182,7 +182,7 @@ export default {
       transactionId: 0,
       token: localStorage.getItem("token"),
       form: {
-        userId: localStorage.getItem("userId"),
+        notTransactionId: 0,
       },
       show: true,
       description: "",
@@ -213,14 +213,14 @@ export default {
 
   components: {
     CheckboxMarked,
-    CloudUpload,
+    // CloudUpload,
     Download,
     ClipboardEdit,
   },
   methods: {
     handleEdit(e, id) {
       e.preventDefault();
-      this.transactionId = id;
+      this.form.notTransactionId = id;
     },
 
     onReset(event) {
@@ -239,7 +239,7 @@ export default {
 
     onSubmit(event) {
       event.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update-approve?transactionId=${this.transactionId}`;
       console.log(this.transactionId);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

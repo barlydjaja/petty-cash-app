@@ -266,7 +266,10 @@ export default {
         .then((res) => {
           if (res.status === 200) this.$router.go();
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err.response.data.message);
+          this.$emit("edit-twice", err.response.data.message);
+        });
       // alert(JSON.stringify(this.form));
       // console.log(this.form);
       // console.log(this.transactionId);

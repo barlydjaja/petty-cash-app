@@ -100,8 +100,8 @@ export default {
           this.userApprovals = res.data.transactions;
           this.totalItems = res.data.totalItems;
           // this.totalPages = res.data.totalPages;
-          console.log(res.data);
-          console.log(res.data.transactions);
+          // console.log(res.data);
+          // console.log(res.data.transactions);
         })
         .catch((err) => console.log(err));
     }

@@ -65,7 +65,7 @@
       <!-- </div> -->
     </div>
     <b-modal id="modalReject" @ok="handleOkReject" hide-header centered>
-      <h1 class="text-center">Reject Transaction?</h1>
+      <h1 class="text-center">Cancel Delete?</h1>
       <!-- <b-card class="mt-3" header="Form Data Result">
         <pre class="m-0">{{ form }}</pre>
       </b-card> -->
@@ -126,7 +126,10 @@ export default {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
-      axios.get(url, config).then((res) => console.log(res.data));
+      axios.get(url, config).then((res) => {
+        console.log(res.data);
+        if (res.status === 200) this.$router.go();
+      });
     },
   },
 };

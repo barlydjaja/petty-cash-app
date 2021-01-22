@@ -11,5 +11,6 @@ import java.net.MalformedURLException;
 
 public interface UploadFileService {
     UploadFileResponse uploadFile(MultipartFile file, long transactionId) throws IOException, NotFoundException;
-    Resource loadFile(long transactionId) throws MalformedURLException, FileNotFoundException;
+    Resource loadFile(long transactionId) throws MalformedURLException, FileNotFoundException, NotFoundException;
+    UploadFileResponse uploadPendingRequest(MultipartFile file, long transactionId) throws IOException, NotFoundException;
 }

@@ -11,6 +11,9 @@ import com.pettycash.entity.User;
 
 import javassist.NotFoundException;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 public interface TransactionService {
     Transaction addTransaction(TransactionDTO dto ,User user, TransactionType transactionType) throws NotFoundException;
 
@@ -20,7 +23,7 @@ public interface TransactionService {
 
     boolean updateTransaction(long transactionId, TransactionDTO dto, long userId) throws NotFoundException;
 
-    boolean updateTransaction(long transactionId, PendingTransaction pendingTransaction, long userId) throws NotFoundException;
+    boolean updateTransaction(long transactionId, PendingTransaction pendingTransaction, long userId) throws NotFoundException, IOException;
 
     Transaction getById(long transactionId);
 

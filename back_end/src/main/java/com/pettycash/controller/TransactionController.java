@@ -1,5 +1,6 @@
 package com.pettycash.controller;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -61,7 +62,6 @@ public class TransactionController {
             notApprovedTransaction = notApprovedTransactionService.addNotApprovedTransaction(transactionDTO);
             return new ResponseEntity<>(notApprovedTransaction, HttpStatus.OK);
         }
-
     }
 
     @PostMapping("/user")
@@ -107,7 +107,7 @@ public class TransactionController {
 
     @GetMapping("/approve-update")
     @CrossOrigin
-    public ResponseEntity<GeneralResponse>  approveUpdateTransaction(@RequestParam long userId, @RequestParam long transactionId, HttpServletRequest request) throws NotFoundException {
+    public ResponseEntity<GeneralResponse>  approveUpdateTransaction(@RequestParam long userId, @RequestParam long transactionId, HttpServletRequest request) throws NotFoundException, IOException {
         HttpStatus status;
         GeneralResponse response = new GeneralResponse();
         boolean result = false;
@@ -126,7 +126,6 @@ public class TransactionController {
 
         setResponse(response, result, request);
         return new ResponseEntity<>(response, status);
-
     }
 
     @PostMapping("/update")
@@ -150,8 +149,7 @@ public class TransactionController {
             else if(transaction.getPendingUpdate().equalsIgnoreCase(Const.NO)) {
                     pendingTransactionService.savePendingTransaction(transactionId, transactionDTO);
                     transactionService.setPendingDeleteUpdate(transactionId, Const.UPDATE);
-                }
-
+            }
 
         if(result){
             status = HttpStatus.OK;
@@ -186,6 +184,46 @@ public class TransactionController {
         PendingTransaction pendingTransaction = pendingTransactionService.updatePendingTransaction(request);
 
         return new ResponseEntity<>(pendingTransaction, HttpStatus.OK);
+    }
+
+    @PostMapping("/update-approve")
+    @CrossOrigin
+    public ResponseEntity<NotApprovedTransaction> updateNotApprovedTransaction(@RequestBody Map<String, Object> request) throws NotFoundException {
+        /*
+            {
+                "notTransactionId" : long,
+                "transactionTypeId" : long,
+                "amount" : long,
+                "description" : String,
+                "receipt" : String,
+            }
+         */
+        NotApprovedTransaction notApprovedTransaction = notApprovedTransactionService.updateNotApprovedTransaction(request);
+
+        return new ResponseEntity<>(notApprovedTransaction, HttpStatus.OK);
+    }
+
+    @GetMapping("/reject-approve")
+    @CrossOrigin
+    public ResponseEntity<GeneralResponse> rejectApprove(@RequestParam long transactionId, HttpServletRequest request) {
+        GeneralResponse response = new GeneralResponse();
+        HttpStatus status;
+        boolean result;
+        try {
+            notApprovedTransactionService.rejectNotApproved(transactionId);
+            result = true;
+        } catch (Exception e){
+            result = false;
+            System.out.println(e.getLocalizedMessage());
+        }
+
+        if(result){
+            status = HttpStatus.OK;
+        } else status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        setResponse(response, result, request);
+
+        return new ResponseEntity<>(response, status);
     }
 
     @GetMapping("/reject-delete")

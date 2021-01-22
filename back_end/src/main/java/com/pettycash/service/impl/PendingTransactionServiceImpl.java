@@ -79,4 +79,9 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
 
         return pendingTransactionRepository.save(pendingTransaction);
     }
+
+    @Override
+    public void updateBasic(PendingTransaction pendingTransaction) {
+        pendingTransactionRepository.save(pendingTransaction);
+    }
 }

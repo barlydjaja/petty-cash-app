@@ -35,9 +35,17 @@ public class FileController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/upload-pending")
+    @CrossOrigin
+    public ResponseEntity<UploadFileResponse> pendingUploadFile(@RequestParam("file")MultipartFile file, @RequestParam("transactionId") long transactionId) throws IOException, NotFoundException {
+        UploadFileResponse response = uploadFileService.uploadPendingRequest(file, transactionId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/download/{transactionId}")
     @CrossOrigin
-    public ResponseEntity<Resource> downloadFIle(@PathVariable("transactionId") long transactionId, HttpServletRequest request) throws IOException {
+    public ResponseEntity<Resource> downloadFIle(@PathVariable("transactionId") long transactionId, HttpServletRequest request) throws IOException, NotFoundException {
         Resource resource = uploadFileService.loadFile(transactionId);
 
         String contentType;

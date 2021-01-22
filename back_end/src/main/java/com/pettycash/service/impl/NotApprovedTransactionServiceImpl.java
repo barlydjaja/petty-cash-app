@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class NotApprovedTransactionServiceImpl implements NotApprovedTransactionService {
@@ -89,6 +90,23 @@ public class NotApprovedTransactionServiceImpl implements NotApprovedTransaction
     @Override
     public NotApprovedTransaction findById(long id) {
         return notApprovedTransactionRepository.getOne(id);
+    }
+
+    @Override
+    public void rejectNotApproved(long id) {
+        NotApprovedTransaction notApprovedTransaction = notApprovedTransactionRepository.getOne(id);
+        notApprovedTransactionRepository.delete(notApprovedTransaction);
+    }
+
+    @Override
+    public NotApprovedTransaction updateNotApprovedTransaction(Map<String, Object> request) throws NotFoundException {
+        NotApprovedTransaction notApprovedTransaction = notApprovedTransactionRepository.getOne(Long.parseLong(String.valueOf(request.get("notTransactionId"))));
+        notApprovedTransaction.setAmount(Long.parseLong(String.valueOf(request.get("amount"))));
+        notApprovedTransaction.setTransactionType(transactionTypeService.getTypeById(Long.parseLong(String.valueOf(request.get("transactionTypeId")))));
+        notApprovedTransaction.setReceipt(String.valueOf(request.get("receipt")));
+        notApprovedTransaction.setDescription(String.valueOf(request.get("description")));
+
+        return notApprovedTransactionRepository.save(notApprovedTransaction);
     }
 
     private long toNegative(long amount) {

@@ -45,6 +45,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     public UploadFileResponse uploadFile(MultipartFile file, long transactionId) throws IOException, NotFoundException {
         UploadFileResponse response = new UploadFileResponse();
+        User admin = userService.getUserById(1);
 
         if (transactionService.getById(transactionId) == null) {
             throw new NotFoundException("transaction not found " + transactionId);
@@ -57,13 +58,19 @@ public class UploadFileServiceImpl implements UploadFileService {
             throw new NotFoundException("user not found for userId " + transaction.getUser().getUserId());
         }
 
-        Path fileStorageLocation = Paths.get(uploadDir.concat("\\").concat(String.valueOf(userId)).concat("\\").concat(String.valueOf(transactionId)))
+        Path fileStorageLocation = Paths.get(uploadDir.concat("\\").concat(String.valueOf(admin.getUserId())).concat("\\").concat(String.valueOf(transactionId)))
                 .toAbsolutePath()
                 .normalize();
         Files.createDirectories(fileStorageLocation);
 
-        String extension = Objects.requireNonNull(file.getContentType()).substring(file.getContentType().length() - 3, file.getContentType().length());
-        String fileName = transaction.getTransactionType().getTransactionTypeName().concat(".").concat(extension);
+        String fileExtension = "";
+        int index = Objects.requireNonNull(file.getContentType()).lastIndexOf('/');
+
+        if(index > 0){
+            fileExtension = file.getContentType().substring(index + 1);
+        }
+
+        String fileName = transaction.getTransactionType().getTransactionTypeName().concat(".").concat(fileExtension);
 
         try (InputStream inputStream = file.getInputStream()) {
             fileStorageLocation = fileStorageLocation.resolve(StringUtils.cleanPath(Objects.requireNonNull(fileName)));
@@ -86,11 +93,11 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public Resource loadFile(long transactionId) throws FileNotFoundException, NotFoundException {
-        User user = userService.getUserById(1);
+        User admin = userService.getUserById(1);
         try {
             Transaction transaction = transactionService.getById(transactionId);
 
-            Path fileStorageLocation = Paths.get(uploadDir.concat("\\").concat(String.valueOf(user.getUserId())).concat("\\").concat(String.valueOf(transactionId)))
+            Path fileStorageLocation = Paths.get(uploadDir.concat("\\").concat(String.valueOf(admin.getUserId())).concat("\\").concat(String.valueOf(transactionId)))
                     .resolve(transaction.getFileName())
                     .toAbsolutePath()
                     .normalize();
@@ -113,6 +120,8 @@ public class UploadFileServiceImpl implements UploadFileService {
             throw new NotFoundException("transaction not found " + transactionId);
         }
 
+        Transaction transaction = transactionService.getById(transactionId);
+
         PendingTransaction pendingTransaction = pendingTransactionService.getByTransactionId(transactionId);
         long userId = pendingTransaction.getUser().getUserId();
 
@@ -125,8 +134,14 @@ public class UploadFileServiceImpl implements UploadFileService {
                 .normalize();
         Files.createDirectories(fileStorageLocation);
 
-        String extension = Objects.requireNonNull(file.getContentType()).substring(file.getContentType().length() - 3, file.getContentType().length());
-        String fileName = pendingTransaction.getTransactionType().getTransactionTypeName().concat(".").concat(extension);
+        String fileExtension = "";
+        int index = Objects.requireNonNull(file.getContentType()).lastIndexOf('/');
+
+        if(index > 0){
+            fileExtension = file.getContentType().substring(index + 1);
+        }
+
+        String fileName = transaction.getTransactionType().getTransactionTypeName().concat(".").concat(fileExtension);
 
         try (InputStream inputStream = file.getInputStream()) {
             fileStorageLocation = fileStorageLocation.resolve(StringUtils.cleanPath(Objects.requireNonNull(fileName)));

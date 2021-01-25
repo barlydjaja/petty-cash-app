@@ -1,7 +1,6 @@
 package com.pettycash.service.impl;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,17 +12,13 @@ import java.util.Objects;
 
 import com.pettycash.en.Const;
 import com.pettycash.entity.PendingTransaction;
-import com.pettycash.repository.PendingTransactionRepository;
 import com.pettycash.service.PendingTransactionService;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.pettycash.dto.LandingPageDTO;
 import com.pettycash.dto.TransactionDTO;
 import com.pettycash.entity.Transaction;
 import com.pettycash.entity.TransactionType;
@@ -33,7 +28,6 @@ import com.pettycash.service.TransactionService;
 import com.pettycash.service.TransactionTypeService;
 import com.pettycash.service.UserService;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -139,6 +133,7 @@ public class TransactionServiceImpl implements TransactionService {
             Transaction transaction = repo.getOne(transactionId);
             repo.delete(repo.getOne(transactionId));
 
+            if(!repo.findAllByOrderByTransactionDateAsc().isEmpty()) {
                 int flag = 0;
                 Transaction indexMinus1 = null;
                 List<Transaction> looping = repo.findAllByOrderByTransactionDateAsc();
@@ -176,10 +171,10 @@ public class TransactionServiceImpl implements TransactionService {
                         } else {
                             update.get(i).setResidue(update.get(i - 1).getResidue() + update.get(i).getAmount());
                         }
-                            repo.save(update.get(i));
-                            if (i == update.size() - 1) {
-                                userService.updateUser(user, update.get(i).getResidue());
-                            }
+                        repo.save(update.get(i));
+                        if (i == update.size() - 1) {
+                            userService.updateUser(user, update.get(i).getResidue());
+                        }
                     }
                 }
 
@@ -188,6 +183,9 @@ public class TransactionServiceImpl implements TransactionService {
                     userService.updateUser(user, looping.get(looping.size() - 1).getResidue());
                 }
                 result = true;
+            } else {
+                userService.updateUser(user, 0);
+            }
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }

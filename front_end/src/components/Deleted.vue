@@ -96,7 +96,7 @@ export default {
 
     handleOkReject(e) {
       e.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/reject-delete?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/reject-delete?transactionId=${this.transactionId}`;
       console.log(this.transactionId);
       const config = {
         headers: {
@@ -118,7 +118,7 @@ export default {
 
     handleDelete(id) {
       console.log("deleted");
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/delete?userId=${localStorage.getItem(
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/delete?userId=${localStorage.getItem(
         "userId"
       )}&transactionId=${id}`;
       const config = {

@@ -5,9 +5,7 @@
         <b-navbar toggleable="lg" class="px-0">
           <b-navbar-brand href="#" class="brand-text px-0">
             <router-link to="/">
-              <div class="text-coloring">
-                PETTY CASH
-              </div>
+              <div class="text-coloring">PETTY CASH</div>
             </router-link>
           </b-navbar-brand>
 
@@ -103,7 +101,7 @@
                   </div>
                 </div>
               </div>
-              <div class="mx-3 text-config" v-if="!isLogin()">Register</div>
+              <!-- <div class="mx-3 text-config" v-if="!isLogin()">Register</div> -->
               <div class="mx-3 text-config" v-if="isLogin()">
                 <!-- welcome back {{ username }} -->
                 <div class="dropdown">
@@ -180,7 +178,7 @@ export default {
         return;
       }
       // Post to server
-      const url = "http://10.69.72.89:8081/pettycash/secured/login";
+      const url = "http://10.69.72.99:8081/pettycash/secured/login";
       axios
         .post(url, this.form)
         .then((res) => {

@@ -1,7 +1,7 @@
 <template>
   <div class="background">
     <Header />
-    <b-container class="my-5 ">
+    <b-container class="my-5">
       <b-jumbotron class="pt-4 vh-75">
         <b-row class="justify-content-center">
           <h1>Transaction</h1>
@@ -43,7 +43,7 @@
           v-on:edit-twice="onEditTwice"
           v-if="!isLoading"
         />
-        <div class="text-center ">
+        <div class="text-center">
           <pagination
             v-model="pages"
             :records="totalItems"
@@ -99,7 +99,7 @@ export default {
       this.isLoading = true;
       this.pages = pageNumber;
       // console.log(pageNumber);
-      let url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
+      let url = `http://10.69.72.99:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
         "userId"
       )}&page=${pageNumber - 1}`;
       const config = {
@@ -133,7 +133,7 @@ export default {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
 
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
+      const url = `http://10.69.72.99:8081/pettycash/v1/view/approved-transaction?userId=${localStorage.getItem(
         "userId"
       )}&page=${this.pages - 1}`;
 

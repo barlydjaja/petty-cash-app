@@ -86,7 +86,7 @@ export default {
     if (localStorage.getItem("token")) {
       // let page = this.pages;
       // if (this.pages === 0) this.page = 0;
-      const url = `http://10.69.72.89:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/view/not-approved-transaction?userId=1&page=${0}`;
 
       const config = {
         headers: {

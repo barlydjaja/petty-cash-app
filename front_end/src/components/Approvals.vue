@@ -33,7 +33,7 @@
           <b-button
             v-b-modal="'my-modal'"
             @click="(e) => handleEdit(e, userApproval.notTransactionId)"
-            class="btn btn-sm mx-1 "
+            class="btn btn-sm mx-1"
           >
             <ClipboardEdit />
           </b-button>
@@ -51,7 +51,7 @@
             v-auth-href="{ token: token }"
             v-bind:href="
               'http://10.69.72.89:8081/pettycash/v1/file/download/' +
-                userApproval.transactionId
+              userApproval.transactionId
             "
             v-if="userApproval.fileName"
             class="btn btn-sm btn-secondary mx-1"
@@ -239,7 +239,7 @@ export default {
 
     onSubmit(event) {
       event.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update-approve?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/update-approve?transactionId=${this.transactionId}`;
       console.log(this.transactionId);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -271,7 +271,7 @@ export default {
       let formData = new FormData();
       formData.append("file", this.file);
       formData.append("transactionId", this.transactionId);
-      const url = "http://10.69.72.89:8081/pettycash/v1/file/upload";
+      const url = "http://10.69.72.99:8081/pettycash/v1/file/upload";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -296,7 +296,7 @@ export default {
 
     handleOk(e) {
       e.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/approve?userId=${localStorage.getItem(
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/approve?userId=${localStorage.getItem(
         "userId"
       )}&transactionId=${this.transactionId}`;
       console.log(localStorage.getItem("userId"));

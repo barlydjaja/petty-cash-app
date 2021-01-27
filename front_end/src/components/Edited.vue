@@ -33,7 +33,7 @@
           <b-button
             v-b-modal="'my-modal'"
             @click="(e) => handleEdit(e, userApproval.pendingTransactionId)"
-            class="btn btn-sm "
+            class="btn btn-sm"
           >
             <ClipboardEdit />
           </b-button>
@@ -51,7 +51,7 @@
             v-auth-href="{ token: token }"
             v-bind:href="
               'http://10.69.72.89:8081/pettycash/v1/file/download/' +
-                userApproval.transactionId
+              userApproval.transactionId
             "
             v-if="userApproval.fileName"
             class="btn btn-sm btn-secondary mx-1"
@@ -260,7 +260,7 @@ export default {
 
     onSubmit(event) {
       event.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/edit-pending`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/edit-pending`;
       // {pendingTransactionId, transactionTypeId, amount,description, receipt}
       console.log(this.transactionId);
       const config = {
@@ -299,7 +299,7 @@ export default {
       // console.log(formData);
       formData.append("file", this.file);
       formData.append("transactionId", this.transactionId);
-      const url = "http://10.69.72.89:8081/pettycash/v1/file/upload-pending";
+      const url = "http://10.69.72.99:8081/pettycash/v1/file/upload-pending";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -325,7 +325,7 @@ export default {
     handleOk(e) {
       e.preventDefault();
       console.log("user roleId: " + localStorage.getItem("userId"));
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/approve-update?transactionId=${
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/approve-update?transactionId=${
         this.transactionId
       }&userId=${localStorage.getItem("userId")}`;
 
@@ -351,7 +351,7 @@ export default {
 
     handleOkReject(e) {
       e.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/reject-update?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/reject-update?transactionId=${this.transactionId}`;
       console.log(this.transactionId);
       const config = {
         headers: {

@@ -5,7 +5,7 @@
     <router-link to="/demo" />
     <router-link to="/login" />
     <router-link to="/transaction" />
-    <router-link to="/approval"></router-link>
+    <router-link to="/approval" />
     <router-link to="/edited" />
     <router-link to="/delted" />
     <router-view />
@@ -27,7 +27,7 @@ export default {
 }
 
 .background {
-  background: #458679;
+  background: #5b9279;
   min-height: 90vh;
 }
 </style>

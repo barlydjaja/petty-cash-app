@@ -51,8 +51,8 @@
           <a
             v-auth-href="{ token: token }"
             v-bind:href="
-              'http://10.69.72.89:8081/pettycash/v1/file/download/' +
-                userTransaction.transactionId
+              'http://10.69.72.99:8081/pettycash/v1/file/download/' +
+              userTransaction.transactionId
             "
             v-if="userTransaction.fileName"
             class="btn btn-sm btn-secondary mx-1"
@@ -163,9 +163,7 @@
       centered
       ok-variant="danger"
     >
-      <h4 class="lead text-center">
-        Delete Transaction?
-      </h4>
+      <h4 class="lead text-center">Delete Transaction?</h4>
       <!-- <button v-on:click="submitFile()">Submit</button> -->
     </b-modal>
   </div>
@@ -230,8 +228,8 @@ export default {
       this.transactionId = id;
     },
 
-    handleDelete: function() {
-      const urlDel = `http://10.69.72.89:8081/pettycash/v1/transaction/delete?userId=${localStorage.getItem(
+    handleDelete: function () {
+      const urlDel = `http://10.69.72.99:8081/pettycash/v1/transaction/delete?userId=${localStorage.getItem(
         "userId"
       )}&transactionId=${this.transactionId} `;
       const config = {
@@ -256,7 +254,7 @@ export default {
 
     onSubmit(event) {
       event.preventDefault();
-      const url = `http://10.69.72.89:8081/pettycash/v1/transaction/update?transactionId=${this.transactionId}`;
+      const url = `http://10.69.72.99:8081/pettycash/v1/transaction/update?transactionId=${this.transactionId}`;
       // console.log(this.form);
       const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -283,7 +281,7 @@ export default {
       let formData = new FormData();
       formData.append("file", this.file);
       formData.append("transactionId", this.transactionId);
-      const url = "http://10.69.72.89:8081/pettycash/v1/file/upload";
+      const url = "http://10.69.72.99:8081/pettycash/v1/file/upload";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

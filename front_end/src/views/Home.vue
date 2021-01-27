@@ -17,7 +17,7 @@
               <img
                 src="../images/login-register.png"
                 alt="login"
-                style="width:150px ; height:150px"
+                style="width: 150px; height: 150px"
                 class="mb-3"
               />
               <br />
@@ -27,7 +27,7 @@
               <img
                 src="../images/Income.png"
                 alt="income"
-                style="height:150px ; width:150px"
+                style="height: 150px; width: 150px"
                 class="mb-3"
               />
               <br />
@@ -37,7 +37,7 @@
               <img
                 src="../images/Expenses.png"
                 alt="expenses"
-                style="height:150px ; width:150px"
+                style="height: 150px; width: 150px"
                 class="mb-3"
               />
               <br />
@@ -47,7 +47,7 @@
               <img
                 src="../images/receipt.png"
                 alt="receipt"
-                style="height:150px ; width:150px"
+                style="height: 150px; width: 150px"
                 class="mb-3"
               />
               <br />
@@ -56,7 +56,7 @@
           </b-row>
 
           <div href="#" class="more-info-btn">
-            <router-link to="/demo">
+            <router-link to="/transaction">
               <span class="button-text-center">
                 {{ $t("startNow") }}
               </span>

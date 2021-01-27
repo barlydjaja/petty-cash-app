@@ -119,7 +119,7 @@ export default {
     onSubmit(event) {
       event.preventDefault();
       // console.log(localStorage.getItem("token"));
-      const url = "http://10.69.72.89:8081/pettycash/v1/transaction/add";
+      const url = "http://10.69.72.99:8081/pettycash/v1/transaction/add";
       const config = {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
